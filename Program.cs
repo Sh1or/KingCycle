@@ -1,16 +1,39 @@
+using App.Models;
+using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Thêm dịch vụ vào container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+builder.Services.Configure<RazorViewEngineOptions>(options =>
+{
+    // View\Controller\Action.cshtml
+    // MyView\controller\Action.cshtml
+    //{0} -> tên action
+    //{1} -> tên controller
+    //{2} -> tên Area
+    options.ViewLocationFormats.Add("/MyView/{1}/{0}" + RazorViewEngine.ViewExtension);
+});
+
+// Thêm cấu hình
+var appConfiguration = builder.Configuration;
+
+// Thêm DbContext
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
+    string connectString = appConfiguration.GetConnectionString("DefaultConnection");
+    options.UseSqlServer(connectString);
+});
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Cấu hình pipeline yêu cầu HTTP.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    // Giá trị mặc định HSTS là 30 ngày. Bạn có thể muốn thay đổi điều này cho các kịch bản sản xuất, xem https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
