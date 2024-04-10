@@ -9,8 +9,9 @@ namespace XEDAPVIP.Migrations
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.CreateTable(
+        {   
+            //table roles
+             migrationBuilder.CreateTable(
                 name: "Roles",
                 columns: table => new
                 {
@@ -22,7 +23,8 @@ namespace XEDAPVIP.Migrations
                 {
                     table.PrimaryKey("PK_Roles", x => x.RoleID);
                 });
-
+            migrationBuilder.Sql("INSERT INTO Roles (RoleName) VALUES ('Admin'), ('Customer');");
+            //table User
             migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
@@ -51,19 +53,14 @@ namespace XEDAPVIP.Migrations
                         principalColumn: "RoleID",
                         onDelete: ReferentialAction.Cascade);
                 });
-                migrationBuilder.CreateIndex(
-                name: "IX_Users_RoleID",
-                table: "Users",
-                column: "RoleID");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {   
-             migrationBuilder.DropTable(
+            migrationBuilder.DropTable(
                 name: "Roles");
-                
-             migrationBuilder.DropTable(
+              migrationBuilder.DropTable(
                 name: "Users");
 
         }
