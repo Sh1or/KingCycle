@@ -53,6 +53,7 @@ namespace XEDAPVIP.Migrations
                         principalColumn: "RoleID",
                         onDelete: ReferentialAction.Cascade);
                 });
+                
         }
 
         /// <inheritdoc />
