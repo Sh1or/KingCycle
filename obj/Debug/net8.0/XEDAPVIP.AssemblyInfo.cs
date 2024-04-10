@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("XEDAPVIP")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f402d9acb5133bfd6e01c1471a0925902de03c21")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d453f3d2f3c262f04a7c4dbff7f06a87848c8327")]
 [assembly: System.Reflection.AssemblyProductAttribute("XEDAPVIP")]
 [assembly: System.Reflection.AssemblyTitleAttribute("XEDAPVIP")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
