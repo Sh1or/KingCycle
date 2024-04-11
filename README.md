@@ -2,10 +2,6 @@
 
 teamproject
 
-# Generate Database
-
-dotnet ef database update
-
 # Package (run in terminal)
 
 dotnet tool install --global dotnet-ef
@@ -33,3 +29,7 @@ dotnet add package Microsoft.AspNetCore.Authentication.OpenIDConnect
 dotnet add package Microsoft.AspNetCore.Authentication.Twitter
 dotnet add package MailKit
 dotnet add package MimeKit
+
+# Generate Database
+
+dotnet ef database update
