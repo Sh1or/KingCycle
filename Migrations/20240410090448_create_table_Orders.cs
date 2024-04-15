@@ -30,7 +30,7 @@ namespace XEDAPVIP.Migrations
                         name: "FK_Orders_Users_UserID",
                         column: x => x.UserID,
                         principalTable: "Users",
-                        principalColumn: "UserID",
+                        principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
                         table.CheckConstraint("CK_OrderStatus", "[OrderStatus] IN ('Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled')");
                 });
