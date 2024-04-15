@@ -4,6 +4,7 @@ teamproject
 
 # Package (run in terminal)
 
+dotnet tool install -g Microsoft.Web.LibraryManager.Cli
 dotnet tool install --global dotnet-ef
 dotnet tool install --global dotnet-aspnet-codegenerator
 dotnet add package Microsoft.VisualStudio.Web.CodeGeneration.Design

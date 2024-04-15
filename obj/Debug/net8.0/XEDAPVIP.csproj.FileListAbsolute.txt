@@ -289,3 +289,5 @@ E:\baquan\Nam4\Ky2\XEDAPVIP\bin\Debug\net8.0\runtimes\win-x64\native\sni.dll
 E:\baquan\Nam4\Ky2\XEDAPVIP\bin\Debug\net8.0\runtimes\win-x86\native\sni.dll
 E:\baquan\Nam4\Ky2\XEDAPVIP\bin\Debug\net8.0\runtimes\unix\lib\netcoreapp2.1\System.Data.SqlClient.dll
 E:\baquan\Nam4\Ky2\XEDAPVIP\bin\Debug\net8.0\runtimes\win\lib\netcoreapp2.1\System.Data.SqlClient.dll
+E:\baquan\Nam4\Ky2\XEDAPVIP\bin\Debug\net8.0\appsettings.identity.json
+E:\baquan\Nam4\Ky2\XEDAPVIP\bin\Debug\net8.0\libman.json
