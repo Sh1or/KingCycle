@@ -139,7 +139,7 @@ namespace App.Areas.Identity.Controllers
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 
-                    // https://localhost:5001/confirm-email?userId=fdsfds&code=xyz&returnUrl=
+                    // https://localhost:5019/confirm-email?userId=fdsfds&code=xyz&returnUrl=
                     var callbackUrl = Url.ActionLink(
                         action: nameof(ConfirmEmail),
                         values: 

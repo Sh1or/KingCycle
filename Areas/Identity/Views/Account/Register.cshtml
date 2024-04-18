@@ -5,55 +5,25 @@
     ViewData["Title"] = "Đăng ký tài khoản";
 }
 
-<h1>@ViewData["Title"].</h1>
+<div class="d-flex justify-content-center "> 
+    <img
+  src="/image/logo.png"
+  class=" img shadow-2-strong"
+  alt="LOGO"
+/>
+</div>
 
-<div class="row">
-    <div class="col-md-8">
-        <section>   
-            <form asp-controller="Account" asp-action="Register" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal" role="form">
-                <h4>Tạo tài khoản mới trên website.</h4>
-                <hr />
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <div class="form-group">
-                    <label asp-for="UserName" class="col-md-10 control-label"></label>
-                    <div class="col-md-10">
-                        <input asp-for="UserName" class="form-control" />
-                        <span asp-validation-for="UserName" class="text-danger"></span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Email" class="col-md-10 control-label"></label>
-                    <div class="col-md-10">
-                        <input asp-for="Email" class="form-control" />
-                        <span asp-validation-for="Email" class="text-danger"></span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Password" class="col-md-10 control-label"></label>
-                    <div class="col-md-10">
-                        <input asp-for="Password" class="form-control" />
-                        <span asp-validation-for="Password" class="text-danger"></span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label asp-for="ConfirmPassword" class="col-md-10 control-label"></label>
-                    <div class="col-md-10">
-                        <input asp-for="ConfirmPassword" class="form-control" />
-                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-md-offset-2 col-md-10">
-                        <button type="submit" class="btn btn-primary">Đăng ký</button>
-                    </div>
-                </div>
-            </form>          
-        </section>
-    </div>
-    <div class="col-md-4">
-        <section>
-            <h4>Đăng nhập bằng tài khoản.</h4>
+
+
+    <h1 class="d-flex justify-content-center" >@ViewData["Title"].</h1>
+
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <form asp-controller="Account" asp-action="Register" 
+        asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal" role="form">
             <hr />
+<<<<<<< HEAD
 <<<<<<< Updated upstream
             @{
                 var schemes = await SignInManager.GetExternalAuthenticationSchemesAsync();
@@ -82,6 +52,8 @@
             }
         </section>
 =======
+=======
+>>>>>>> main
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="UserName" class="control-label">Tên người dùng</label>
@@ -131,8 +103,12 @@
                                             name="provider" value="@provider.Name" title="Log in using your @provider.Name account">
                                                 @switch(provider.Name)
                                                 {
+<<<<<<< HEAD
                                                     case "Google": 
                                                     <i class="fab fa-google"></i> <!-- Sử dụng font awesome icon -->
+=======
+                                                    case "Google":                                                            <i class="fab fa-google"></i> <!-- Sử dụng font awesome icon -->
+>>>>>>> main
                                                           break;
                                                     case "Facebook":
                                                         <i class="fa-brands fa-facebook-f"></i> <!-- Sử dụng font awesome icon -->
@@ -150,9 +126,17 @@
                 </section>
             </div>
         </form>
+<<<<<<< HEAD
 >>>>>>> Stashed changes
+=======
+>>>>>>> main
     </div>
 </div>
+
+
+
+                         
+   
 
 
 
