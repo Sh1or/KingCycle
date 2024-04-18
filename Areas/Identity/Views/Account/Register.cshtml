@@ -54,6 +54,7 @@
         <section>
             <h4>Đăng nhập bằng tài khoản.</h4>
             <hr />
+<<<<<<< Updated upstream
             @{
                 var schemes = await SignInManager.GetExternalAuthenticationSchemesAsync();
                 var loginProviders = schemes.ToList();
@@ -80,6 +81,76 @@
                 }
             }
         </section>
+=======
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="UserName" class="control-label">Tên người dùng</label>
+                <input asp-for="UserName" class="form-control" />
+                <span asp-validation-for="UserName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Email" class="control-label">Email</label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Password" class="control-label">Mật khẩu</label>
+                <input asp-for="Password" type="password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ConfirmPassword" class="control-label">Xác nhận mật khẩu</label>
+                <input asp-for="ConfirmPassword" type="password" class="form-control" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+            <div class="row justify-content-center ">
+                <button type="submit" class="mt-2 btn btn-outline-primary btn-rounded btn-block">ĐĂNG KÝ</button>
+            </div>
+            <div>
+                <section>
+                    @{
+                        var schemes = await SignInManager.GetExternalAuthenticationSchemesAsync();
+                        var loginProviders = schemes.ToList();
+                        if (loginProviders.Count == 0)
+                        {
+                            <div>
+                                <p>
+                                    Ứng dụng chưa hỗ trợ đăng nhập từ tài khoản ngoài
+                                </p>
+                            </div>
+                        }
+                        else
+                        {
+                            <form asp-controller="Account" asp-action="ExternalLogin" 
+                            asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal" role="form">
+                                 <div>
+                                    <p class=" row justify-content-center">
+                                        @foreach (var provider in loginProviders)
+                                        {
+                                            <button type="submit" class="mt-2 btn btn-outline-primary btn-rounded" 
+                                            name="provider" value="@provider.Name" title="Log in using your @provider.Name account">
+                                                @switch(provider.Name)
+                                                {
+                                                    case "Google": 
+                                                    <i class="fab fa-google"></i> <!-- Sử dụng font awesome icon -->
+                                                          break;
+                                                    case "Facebook":
+                                                        <i class="fa-brands fa-facebook-f"></i> <!-- Sử dụng font awesome icon -->
+                                                        break;                                                        default:
+                                                        @provider.Name <!-- Hiển thị tên nhà cung cấp nếu không có icon -->
+                                                        break;
+                                                }
+                                            </button>
+                                        }
+                                    </p>
+                                </div>
+                            </form>
+                        }
+                    }
+                </section>
+            </div>
+        </form>
+>>>>>>> Stashed changes
     </div>
 </div>
 
