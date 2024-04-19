@@ -21,7 +21,7 @@ namespace App.Areas.Identity.Models.AccountViewModels
         [Display(Name = "Mật khẩu")]
         public string Password { get; set; }
 
-        [Display(Name = "Nhớ thông tin đăng nhập?")]
+        [Display(Name = "Ghi nhớ đăng nhập")]
         public bool RememberMe { get; set; }
     }
 }
