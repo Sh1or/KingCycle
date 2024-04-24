@@ -49,30 +49,33 @@
                 <input asp-for="ConfirmPassword" type="password" class="form-control" />
                 <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
             </div>
-            <div class="row justify-content-center">
-                <div class="col-md-6">
-                    <button type="submit" class="mt-2 btn btn-outline-primary btn-rounded btn-block">ĐĂNG KÝ</button>
-                </div>
-                <div class="col-md-6">
-                    <div class="row justify-content-end"> <!-- Thay đổi ở đây -->
-                        <section>
-                            @{
-                                var schemes = await SignInManager.GetExternalAuthenticationSchemesAsync();
-                                var loginProviders = schemes.ToList();
-                                if (loginProviders.Count == 0)
-                                {
-                                    <div>
-                                        <p>
-                                            Ứng dụng chưa hỗ trợ đăng nhập từ tài khoản ngoài
-                                        </p>
-                                    </div>
-                                }
-                                else
-                                {
-                                    <form asp-controller="Account" asp-action="ExternalLogin" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal" role="form">
-                                        <div>
-                                            <p class="justify-content-right">
-                                                @foreach (var provider in loginProviders)
+            <div class="row justify-content-center ">
+                <button type="submit" class="mt-2 btn btn-outline-primary btn-rounded btn-block">ĐĂNG KÝ</button>
+            </div>
+            <div>
+                <section>
+                    @{
+                        var schemes = await SignInManager.GetExternalAuthenticationSchemesAsync();
+                        var loginProviders = schemes.ToList();
+                        if (loginProviders.Count == 0)
+                        {
+                            <div>
+                                <p>
+                                    Ứng dụng chưa hỗ trợ đăng nhập từ tài khoản ngoài
+                                </p>
+                            </div>
+                        }
+                        else
+                        {
+                            <form asp-controller="Account" asp-action="ExternalLogin" 
+                            asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal" role="form">
+                                 <div>
+                                    <p class=" row justify-content-center">
+                                        @foreach (var provider in loginProviders)
+                                        {
+                                            <button type="submit" class="mt-2 btn btn-outline-primary btn-rounded" 
+                                            name="provider" value="@provider.Name" title="Log in using your @provider.Name account">
+                                                @switch(provider.Name)
                                                 {
                                                     case "Google":                                                            <i class="fab fa-google"></i> <!-- Sử dụng font awesome icon -->
                                                           break;
@@ -81,29 +84,15 @@
                                                         break;                                                        default:
                                                         @provider.Name <!-- Hiển thị tên nhà cung cấp nếu không có icon -->
                                                         break;
-                                                    <button type="submit" class="" name="provider" value="@provider.Name" title="Log in using your @provider.Name account">
-                                                        @switch(provider.Name)
-                                                        {
-                                                            case "Google":
-                                                                <i class="fa-brands fa-google "></i> <!-- Sử dụng font awesome icon -->
-                                                                break;
-                                                            case "Facebook":
-                                                                <i class="fa-brands fa-facebook-f"></i> <!-- Sử dụng font awesome icon -->
-                                                                break;
-                                                            default:
-                                                                @provider.Name <!-- Hiển thị tên nhà cung cấp nếu không có icon -->
-                                                                break;
-                                                        }
-                                                    </button>
                                                 }
-                                            </p>
-                                        </div>
-                                    </form>
-                                }
-                            }
-                        </section>
-                    </div>
-                </div>
+                                            </button>
+                                        }
+                                    </p>
+                                </div>
+                            </form>
+                        }
+                    }
+                </section>
             </div>
         </form>
     </div>
