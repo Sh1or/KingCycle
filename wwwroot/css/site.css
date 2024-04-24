@@ -20,3 +20,29 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.fs-7{
+  cursor: pointer;
+  line-height: 5px;
+  display: inline-block; 
+  font-size: 14px;
+  font-family: "Roboto", sans-serif;
+  color: var(--blue-color);
+  text-decoration: none;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.menu_list_item {
+  background-color: #ff4200;
+  height: 36px;
+  padding-left: 5px;
+  padding-right: 5px;
+  transform: skewX(-20deg);
+  list-style: none;
+  display: inline-flex; /* Chuyển sang display flex */
+  align-items: center; /* Canh giữa theo chiều dọc */
+  justify-content: center; /* Canh giữa theo chiều ngang */
+  color: #fff;
+  font-weight: 700;
+  font-size: 12px;
+}
