@@ -7,20 +7,29 @@
 @{
     ViewData["Title"] = "Đăng nhập";
 }
+@{
+    Layout = null;
+}
+<head>
+    <link rel="stylesheet" href="~/login/style.css" asp-append-version="true" />
+    <script src="~/login/showPassword.js" asp-append-version="true" ></script>
+    <script src="https://kit.fontawesome.com/e21f566ee8.js" crossorigin="anonymous"></script>
 
-<div class="d-flex justify-content-center "> 
-    <img
-  src="/image/logo.png"
-  class=" img shadow-2-strong"
-  alt="LOGO"
-/>
+</head>
+
 </div>
-<h1 class="d-flex justify-content-center">@ViewData["Title"].</h1>
-<div class="row d-flex justify-content-center">
-    <div class="col-md-6">
+<div class="login">
+    <div class="logo-container">
+        <a asp-area="" asp-controller="Home" asp-action="Index">
+        <img src="/image/logo.png" alt="LOGO"/>
+        </a>
+        <h1 class="app-title">@ViewData["Title"].</h1>
+    </div>
+
+
+    <div class="login-screen">
         <section>
             <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal" role="form">
-                <hr/>
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-group">
                     <label asp-for="UserNameOrEmail" class="control-label"></label>
@@ -29,27 +38,24 @@
                 </div>
                 <div class="form-group">
                     <label asp-for="Password" class="control-label"></label>
-                        <input asp-for="Password" class="form-control" />
-                        <span asp-validation-for="Password" class="text-danger"></span>
+                    <div class="password-input-container">
+                        <input asp-for="Password" type="password" class="form-control" id="password-input" />
+                        <span class="toggle-password" onclick="togglePasswordVisibility()"><i class="fas fa-eye"></i></span>
+                    </div>
+                    <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
-                <div class="form-group">
-                    <div class="col-md-offset-2 col-md-10">
-                        <div class="checkbox">
+                    @* <div class="checkbox">
                             <label asp-for="RememberMe">
                                 <input asp-for="RememberMe" />
                                 @Html.DisplayNameFor(m => m.RememberMe)
                             </label>
-                        </div>
-                    </div>
-                       <p class="d-flex justify-content-between align-items-center"> <!-- Chỉnh sửa dòng này -->
-                    <a asp-action="Register" asp-route-returnurl="@ViewData["ReturnUrl"]">Chưa có tài khoản? Đăng ký</a>
-                    <a class="justify-content-right " asp-action="ForgotPassword">Quên mật khẩu?</a>
+                    </div> *@
+                       <p class="login-link"> 
+                    <a asp-action="ForgotPassword">Quên mật khẩu?</a> 
                 </p>
-                </div>
                 <div class="form-group">
-                     <div class="row justify-content-center ">
-                <button type="submit" class="mt-2 btn btn-outline-primary btn-rounded btn-block">ĐĂNG NHẬP</button>
-            </div>
+                <button type="submit" class="btn">ĐĂNG NHẬP</button>
+                <button asp-action="Register"asp-route-returnurl="@ViewData["ReturnUrl"]" class="btn">ĐĂNG KÝ</button>
                 </div>
              
            
@@ -71,10 +77,10 @@
                             <form asp-controller="Account" asp-action="ExternalLogin" 
                             asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal" role="form">
                                  <div>
-                                    <p class=" row justify-content-center">
+                                    <p class="btn_icon">
                                         @foreach (var provider in loginProviders)
                                         {
-                                            <button type="submit" class="mt-2 btn btn-outline-primary btn-rounded" 
+                                            <button type="submit" class="btn" 
                                             name="provider" value="@provider.Name" title="Log in using your @provider.Name account">
                                                 @switch(provider.Name)
                                                 {
@@ -82,7 +88,7 @@
                                                         <i class="fab fa-google"></i> <!-- Sử dụng font awesome icon -->
                                                         break;
                                                     case "Facebook":
-                                                        <i class="fa-brands fa-facebook-f"></i> <!-- Sử dụng font awesome icon -->
+                                                        <i class="fa-brands fa-facebook-f"> </i> <!-- Sử dụng font awesome icon -->
                                                         break;                                                        default:
                                                         @provider.Name <!-- Hiển thị tên nhà cung cấp nếu không có icon -->
                                                         break;

@@ -1,59 +1,33 @@
-﻿@inject SignInManager<AppUser> SignInManager
+﻿@using System.Collections.Generic
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Authentication
+@inject SignInManager<AppUser> SignInManager
 
 @model RegisterViewModel
 @{
     ViewData["Title"] = "Đăng ký tài khoản";
 }
 
+@{
+    Layout = null;
+}
+<head>
+    <link rel="stylesheet" href="~/login/style.css" asp-append-version="true" />
+    <script src="~/login/showPassword.js" asp-append-version="true" ></script>
+    <script src="https://kit.fontawesome.com/e21f566ee8.js" crossorigin="anonymous"></script>
+
+</head>
+
 <div class="d-flex justify-content-center "> 
-    <img
-  src="/image/logo.png"
-  class=" img shadow-2-strong"
-  alt="LOGO"
-/>
+    <img src="/image/logo.png" class="img shadow-2-strong" alt="LOGO" />
 </div>
 
-
-
-    <h1 class="d-flex justify-content-center" >@ViewData["Title"].</h1>
-
+<h1 class="d-flex justify-content-center">@ViewData["Title"].</h1>
 
 <div class="row justify-content-center">
-    <div class="col-md-6">
-        <form asp-controller="Account" asp-action="Register" 
-        asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal" role="form">
+    <div class="col-md-4">
+        <form asp-controller="Account" asp-action="Register" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal" role="form">
             <hr />
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-            @{
-                var schemes = await SignInManager.GetExternalAuthenticationSchemesAsync();
-                var loginProviders = schemes.ToList();
-                if (loginProviders.Count == 0)
-                {
-                    <div>
-                        <p>
-                            Ứng dụng chưa hỗ trợ đăng nhập từ tài khoản ngoài
-                        </p>
-                    </div>
-                }
-                else
-                {
-                    <form asp-controller="Account" asp-action="ExternalLogin" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal" role="form">
-                        <div>
-                            <p>
-                                @foreach (var provider in loginProviders)
-                                {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.Name account">@provider.Name</button>
-                                }
-                            </p>
-                        </div>
-                    </form>
-                }
-            }
-        </section>
-=======
-=======
->>>>>>> main
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="UserName" class="control-label">Tên người dùng</label>
@@ -75,71 +49,67 @@
                 <input asp-for="ConfirmPassword" type="password" class="form-control" />
                 <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
             </div>
-            <div class="row justify-content-center ">
-                <button type="submit" class="mt-2 btn btn-outline-primary btn-rounded btn-block">ĐĂNG KÝ</button>
-            </div>
-            <div>
-                <section>
-                    @{
-                        var schemes = await SignInManager.GetExternalAuthenticationSchemesAsync();
-                        var loginProviders = schemes.ToList();
-                        if (loginProviders.Count == 0)
-                        {
-                            <div>
-                                <p>
-                                    Ứng dụng chưa hỗ trợ đăng nhập từ tài khoản ngoài
-                                </p>
-                            </div>
-                        }
-                        else
-                        {
-                            <form asp-controller="Account" asp-action="ExternalLogin" 
-                            asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal" role="form">
-                                 <div>
-                                    <p class=" row justify-content-center">
-                                        @foreach (var provider in loginProviders)
-                                        {
-                                            <button type="submit" class="mt-2 btn btn-outline-primary btn-rounded" 
-                                            name="provider" value="@provider.Name" title="Log in using your @provider.Name account">
-                                                @switch(provider.Name)
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <button type="submit" class="mt-2 btn btn-outline-primary btn-rounded btn-block">ĐĂNG KÝ</button>
+                </div>
+                <div class="col-md-6">
+                    <div class="row justify-content-end"> <!-- Thay đổi ở đây -->
+                        <section>
+                            @{
+                                var schemes = await SignInManager.GetExternalAuthenticationSchemesAsync();
+                                var loginProviders = schemes.ToList();
+                                if (loginProviders.Count == 0)
+                                {
+                                    <div>
+                                        <p>
+                                            Ứng dụng chưa hỗ trợ đăng nhập từ tài khoản ngoài
+                                        </p>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <form asp-controller="Account" asp-action="ExternalLogin" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal" role="form">
+                                        <div>
+                                            <p class="justify-content-right">
+                                                @foreach (var provider in loginProviders)
                                                 {
-<<<<<<< HEAD
-                                                    case "Google": 
-                                                    <i class="fab fa-google"></i> <!-- Sử dụng font awesome icon -->
-=======
                                                     case "Google":                                                            <i class="fab fa-google"></i> <!-- Sử dụng font awesome icon -->
->>>>>>> main
                                                           break;
                                                     case "Facebook":
                                                         <i class="fa-brands fa-facebook-f"></i> <!-- Sử dụng font awesome icon -->
                                                         break;                                                        default:
                                                         @provider.Name <!-- Hiển thị tên nhà cung cấp nếu không có icon -->
                                                         break;
+                                                    <button type="submit" class="" name="provider" value="@provider.Name" title="Log in using your @provider.Name account">
+                                                        @switch(provider.Name)
+                                                        {
+                                                            case "Google":
+                                                                <i class="fa-brands fa-google "></i> <!-- Sử dụng font awesome icon -->
+                                                                break;
+                                                            case "Facebook":
+                                                                <i class="fa-brands fa-facebook-f"></i> <!-- Sử dụng font awesome icon -->
+                                                                break;
+                                                            default:
+                                                                @provider.Name <!-- Hiển thị tên nhà cung cấp nếu không có icon -->
+                                                                break;
+                                                        }
+                                                    </button>
                                                 }
-                                            </button>
-                                        }
-                                    </p>
-                                </div>
-                            </form>
-                        }
-                    }
-                </section>
+                                            </p>
+                                        </div>
+                                    </form>
+                                }
+                            }
+                        </section>
+                    </div>
+                </div>
             </div>
         </form>
-<<<<<<< HEAD
->>>>>>> Stashed changes
-=======
->>>>>>> main
     </div>
 </div>
-
-
-
-                         
-   
-
-
 
 @section Scripts {
     @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }
+
