@@ -374,7 +374,7 @@ namespace App.Areas.Identity.Controllers
         public async Task<IActionResult> EditProfileAsync()
         {
             var user = await GetCurrentUserAsync();
-            
+
             var model = new EditExtraProfileModel()
             {
                 BirthDate = user.BirthDate,
