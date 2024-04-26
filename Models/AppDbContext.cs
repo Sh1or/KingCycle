@@ -1,16 +1,16 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace App.Models 
+namespace App.Models
 {
-   
+
     public class AppDbContext : IdentityDbContext<AppUser>
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
-          //..
-          // this.Roles
-          // IdentityRole<string>
+            //..
+            // this.Roles
+            // IdentityRole<string>
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder builder)
@@ -21,7 +21,7 @@ namespace App.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            
+
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {
                 var tableName = entityType.GetTableName();
@@ -31,9 +31,14 @@ namespace App.Models
                 }
             }
 
+            modelBuilder.Entity<Category>(entity =>
+            {
+                entity.HasIndex(p => p.Slug);
+            });
+
         }
 
-        
+        public DbSet<Category> Categories { set; get; }
 
     }
 }
