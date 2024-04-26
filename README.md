@@ -2,12 +2,9 @@
 
 teamproject
 
-# Generate Database
-
-dotnet ef database update
-
 # Package (run in terminal)
 
+dotnet tool install -g Microsoft.Web.LibraryManager.Cli
 dotnet tool install --global dotnet-ef
 dotnet tool install --global dotnet-aspnet-codegenerator
 dotnet add package Microsoft.VisualStudio.Web.CodeGeneration.Design
@@ -33,3 +30,7 @@ dotnet add package Microsoft.AspNetCore.Authentication.OpenIDConnect
 dotnet add package Microsoft.AspNetCore.Authentication.Twitter
 dotnet add package MailKit
 dotnet add package MimeKit
+
+# Generate Database
+
+dotnet ef database update
