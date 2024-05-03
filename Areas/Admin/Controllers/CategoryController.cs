@@ -26,16 +26,13 @@ namespace App.Areas_Admin_Controllers
         // GET: Admin/Category
         public IActionResult Index()
         {
-
             var items = _context.Categories
                 .Include(c => c.CategoryChildren)   // <-- Nạp các Category con
                 .AsEnumerable()
                 .Where(c => c.ParentCategory == null)
                 .ToList();
 
-
             return View(items);
-
         }
 
         // GET: Admin/Category/Details/5
@@ -60,7 +57,6 @@ namespace App.Areas_Admin_Controllers
         // GET: Admin/Category/Create
         public async Task<IActionResult> Create()
         {
-            // ViewData["ParentId"] = new SelectList(_context.Categories, "Id", "Slug");
             var listcategory = await _context.Categories.ToListAsync();
             listcategory.Insert(0, new Category()
             {
@@ -73,13 +69,10 @@ namespace App.Areas_Admin_Controllers
 
         async Task<IEnumerable<Category>> GetItemsSelectCategorie()
         {
-
             var items = await _context.Categories
                                 .Include(c => c.CategoryChildren)
                                 .Where(c => c.ParentCategory == null)
                                 .ToListAsync();
-
-
 
             List<Category> resultitems = new List<Category>() {
                 new Category() {
@@ -99,9 +92,7 @@ namespace App.Areas_Admin_Controllers
                     {
                         _ChangeTitleCategory(item.CategoryChildren.ToList(), level + 1);
                     }
-
                 }
-
             };
 
             _ChangeTitleCategory = ChangeTitleCategory;
@@ -116,17 +107,13 @@ namespace App.Areas_Admin_Controllers
         {
             if (ModelState.IsValid)
             {
-                if (category.ParentId.Value == -1)
+                if (category.ParentId == -1)
                     category.ParentId = null;
                 _context.Add(category);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            //         var errors = ModelState
-            // .Where(x => x.Value.Errors.Count > 0)
-            // .Select(x => new { x.Key, x.Value.Errors })
-            // .ToArray();
-            // ViewData["ParentId"] = new SelectList(_context.Categories, "Id", "Slug", category.ParentId);
+
             var listcategory = await _context.Categories.ToListAsync();
             listcategory.Insert(0, new Category()
             {
@@ -151,7 +138,17 @@ namespace App.Areas_Admin_Controllers
                 return NotFound();
             }
 
-            ViewData["ParentId"] = new SelectList(await GetItemsSelectCategorie(), "Id", "Title", category.ParentId);
+            // Check if the category being edited is not a child of itself
+            var categoryIds = await _context.Categories.Select(c => c.Id).ToListAsync();
+            if (!categoryIds.Contains(category.ParentId ?? 0))
+            {
+                ViewData["ParentId"] = new SelectList(await GetItemsSelectCategorie(), "Id", "Title", category.ParentId);
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Không thể cập nhật danh mục cha thành một danh mục con của nó.";
+                return RedirectToAction(nameof(Index)); // Redirect back to the index page or any other appropriate page
+            }
 
             return View(category);
         }
@@ -227,9 +224,26 @@ namespace App.Areas_Admin_Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var category = await _context.Categories.FindAsync(id);
+            if (category == null)
+            {
+                return NotFound();
+            }
+
+            if (HasChildCategories(category))
+            {
+                TempData["ErrorMessage"] = "Không thể xóa danh mục có mục con.";
+                return RedirectToAction(nameof(Index)); // Redirect back to the index page or any other appropriate page
+            }
+
             _context.Categories.Remove(category);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            TempData["SuccessMessage"] = "Xóa danh mục thành công."; // Return a success message
+            return RedirectToAction(nameof(Index)); // Redirect back to the index page or any other appropriate page
+        }
+
+        private bool HasChildCategories(Category category)
+        {
+            return _context.Categories.Any(c => c.ParentId == category.Id);
         }
 
         private bool CategoryExists(int id)
