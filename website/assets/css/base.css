@@ -16,7 +16,6 @@ html{
     box-sizing: border-box;
 }
 .grid {
-  
     width: 1200px;
     max-width: 100%;
     margin: 0 auto;
@@ -30,6 +29,7 @@ html{
     flex-wrap: wrap;
 }
 .roboto-light {
+  
     font-family: "Roboto", sans-serif;
     font-weight: 300;
     font-style: normal;
