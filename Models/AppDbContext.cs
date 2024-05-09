@@ -36,9 +36,21 @@ namespace App.Models
                 entity.HasIndex(p => p.Slug);
             });
 
+            modelBuilder.Entity<ProductCategory>(entity =>
+            {
+                entity.HasKey(p => new { p.ProductID, p.CategoryID });
+
+            });
+            modelBuilder.Entity<Product>(entity =>
+            {
+                entity.HasIndex(p => p.Slug).IsUnique();
+
+            });
         }
 
         public DbSet<Category> Categories { set; get; }
-
+        public DbSet<Product> Products { set; get; }
+        public DbSet<ProductDetail> ProductDetails { set; get; }
+        public DbSet<ProductCategory> PostCategories { set; get; }
     }
 }
