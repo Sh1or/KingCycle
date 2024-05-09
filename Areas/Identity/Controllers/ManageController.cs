@@ -10,7 +10,9 @@ using App.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace App.Areas.Identity.Controllers
 {
@@ -24,6 +26,7 @@ namespace App.Areas.Identity.Controllers
         private readonly SignInManager<AppUser> _signInManager;
         private readonly IEmailSender _emailSender;
         private readonly ILogger<ManageController> _logger;
+        private readonly HttpClient _httpClient;
 
         public ManageController(
         UserManager<AppUser> userManager,
@@ -35,6 +38,7 @@ namespace App.Areas.Identity.Controllers
             _signInManager = signInManager;
             _emailSender = emailSender;
             _logger = logger;
+            _httpClient = new HttpClient();
         }
 
         //
@@ -63,7 +67,7 @@ namespace App.Areas.Identity.Controllers
                 profile = new EditExtraProfileModel()
                 {
                     BirthDate = user.BirthDate,
-                    HomeAdress = user.HomeAdress,
+                    HomeAddress = user.HomeAddress,
                     UserName = user.UserName,
                     UserEmail = user.Email,
                     PhoneNumber = user.PhoneNumber,
@@ -370,27 +374,131 @@ namespace App.Areas.Identity.Controllers
             return View("Error");
         }
 
+        public async Task<IActionResult> GetProvinceDistrictWard()
+        {
+            try
+            {
+                var apiUrl = "https://raw.githubusercontent.com/kenzouno1/DiaGioiHanhChinhVN/master/data.json";
+                HttpResponseMessage response = await _httpClient.GetAsync(apiUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var apiData = await response.Content.ReadAsStringAsync();
+                    return Ok(apiData);
+                }
+                else
+                {
+                    // Xử lý trường hợp các status code khác ngoài 200 OK
+                    return StatusCode((int)response.StatusCode);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error: " + ex.Message);
+                return StatusCode(500);
+            }
+        }
+        public async Task<List<Province>> GetProvincesAsync()
+        {
+            var dataDiagioiResponse = await GetProvinceDistrictWard();
+
+            if (dataDiagioiResponse is OkObjectResult okResult && okResult.Value != null)
+            {
+                var apiData = okResult.Value.ToString();
+                var dataProvinces = JsonConvert.DeserializeObject<List<Province>>(apiData);
+                return dataProvinces;
+            }
+            else
+            {
+                // Handle the case where the response is not successful
+                return new List<Province>();
+            }
+        }
+
+
+        public async Task<JsonResult> GetDistrictsByProvinceId(string provinceId)
+        {
+            var provinces = await GetProvincesAsync();
+
+
+            var selectedProvince = provinces.FirstOrDefault(province => province.Id == provinceId);
+
+            if (selectedProvince != null)
+            {
+
+                return Json(selectedProvince.Districts);
+            }
+            else
+            {
+                return Json(new List<District>());
+            }
+        }
+
+
+
+
+        public async Task<JsonResult> GetWardsByDistrictId(string districtId)
+        {
+            var provinces = await GetProvincesAsync();
+
+            // Tìm kiếm quận/huyện dựa trên districtId
+            District selectedDistrict = null;
+            foreach (var province in provinces)
+            {
+                selectedDistrict = province.Districts.FirstOrDefault(district => district.Id == districtId);
+                if (selectedDistrict != null)
+                {
+                    break;
+                }
+            }
+
+            if (selectedDistrict != null)
+            {
+                return Json(selectedDistrict.Wards);
+            }
+            else
+            {
+                return Json(new List<Ward>());
+            }
+        }
+
+
         [HttpGet]
         public async Task<IActionResult> EditProfileAsync()
         {
             var user = await GetCurrentUserAsync();
 
+            var provinces = await GetProvincesAsync();
+
+            // Convert list of provinces to list of SelectListItem
+            var provinceOptions = provinces.Select(p => new SelectListItem
+            {
+                Value = p.Id.ToString(),
+                Text = p.Name
+            }).ToList();
+
+            // Initialize model with necessary data
             var model = new EditExtraProfileModel()
             {
-                BirthDate = user.BirthDate,
-                HomeAdress = user.HomeAdress,
                 UserName = user.UserName,
                 UserEmail = user.Email,
                 PhoneNumber = user.PhoneNumber,
+                HomeAddress = user.HomeAddress,
+                BirthDate = user.BirthDate,
+                ProvinceOptions = provinceOptions, // Assign the list of SelectListItem
+                DistrictOptions = new List<SelectListItem>(), // Initialize with empty list
+                WardOptions = new List<SelectListItem>() // Initialize with empty list
             };
+
             return View(model);
         }
+
         [HttpPost]
         public async Task<IActionResult> EditProfileAsync(EditExtraProfileModel model)
         {
             var user = await GetCurrentUserAsync();
 
-            user.HomeAdress = model.HomeAdress;
+            user.HomeAddress = model.HomeAddress;
             user.BirthDate = model.BirthDate;
             await _userManager.UpdateAsync(user);
 
@@ -398,7 +506,6 @@ namespace App.Areas.Identity.Controllers
             return RedirectToAction(nameof(Index), "Manage");
 
         }
-
 
     }
 }
