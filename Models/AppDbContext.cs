@@ -52,5 +52,6 @@ namespace App.Models
         public DbSet<Product> Products { set; get; }
         public DbSet<ProductDetail> ProductDetails { set; get; }
         public DbSet<ProductCategory> PostCategories { set; get; }
+        public DbSet<Address> Addresses { get; set; }
     }
 }
