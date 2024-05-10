@@ -4,10 +4,10 @@ body{
     padding: auto;
   }
 .register-screen{
+  background-color: #fff;
   padding: 20px;
   border-radius: 10px;
 }
-    padding: 0.8em 1.8em;
 .register{
     margin: 20px auto;
     width: 350px;
