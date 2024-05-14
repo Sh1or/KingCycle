@@ -1,22 +1,28 @@
-@model App.Models.Product
-
+@model XEDAPVIP.Areas.Admin.Models.CreateProductModel
 @{
     ViewData["Title"] = "Create";
+    var list = ViewData["categories"] as MultiSelectList;
 }
 
-<h1>Create</h1>
+<h1>Thêm mới</h1>
 
-<h4>Product</h4>
+<partial name="_AlertMessage" />
+
+<h4>Sản phẩm</h4>
 <hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<form asp-action="Create" enctype="multipart/form-data" id="productForm">
+    <div class="row">
+        <div class="col-md-6">
+            <div asp-validation-summary="All" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="CategoryId" class="control-label"></label>
-                <input asp-for="CategoryId" class="form-control" />
-                <span asp-validation-for="CategoryId" class="text-danger"></span>
+                <label class="control-label">Chọn danh mục</label>
+                @Html.ListBoxFor(model => model.CategoryId, (MultiSelectList)ViewBag.categories, new
+                    {
+                        @class = "w-100",
+                        id = "selectedCategories"
+                    })
             </div>
+
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
@@ -24,7 +30,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
+                <textarea asp-for="Description" class="form-control"></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -38,28 +44,148 @@
                 <span asp-validation-for="DiscountPrice" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Slug" class="control-label"></label>
-                <input asp-for="Slug" class="form-control" />
-                <span asp-validation-for="Slug" class="text-danger"></span>
+                <label for="MainImage" class="control-label">Ảnh chính</label>
+                <input type="file" id="MainImage" name="MainImage" class="form-control" />
             </div>
+
             <div class="form-group">
-                <label asp-for="DateCreated" class="control-label"></label>
-                <input asp-for="DateCreated" class="form-control" />
-                <span asp-validation-for="DateCreated" class="text-danger"></span>
+                <label for="subImages">Hình ảnh phụ:</label>
+                <input type="file" class="form-control-file" id="subImages" name="subImages" multiple>
             </div>
-            <div class="form-group">
-                <label asp-for="DateUpdated" class="control-label"></label>
-                <input asp-for="DateUpdated" class="form-control" />
-                <span asp-validation-for="DateUpdated" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
+
+        <div class="col-md-6">
+            <!-- Biến thể sản phẩm -->
+            <h4>Biến thể sản phẩm</h4>
+            <table id="variantsTable" class="table">
+                <thead>
+                    <tr>
+                        <th>Màu sắc</th>
+                        <th>Kích thước</th>
+                        <th>Số lượng</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <select class="form-control" name="Variants[0].Color">
+                                <option value="Red">Red</option>
+                                <option value="Green">Green</option>
+                                <option value="Blue">Blue</option>
+                                <option value="Black">Black</option>
+                                <option value="White">White</option>
+                                <option value="Yellow">Yellow</option>
+                            </select>
+                        </td>
+                        <td>
+                            <select class="form-control" name="Variants[0].Size">
+                                <option value="S">S</option>
+                                <option value="M">M</option>
+                                <option value="L">L</option>
+                                <option value="XL">XL</option>
+                                <option value="XXL">XXL</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="number" name="Variants[0].Quantity" class="form-control" />
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <button type="button" class="btn btn-primary" id="addVariant">Thêm biến thể</button>
+
+            <!-- Chi tiết sản phẩm -->
+            <h4>Chi tiết sản phẩm</h4>
+            <table id="productDetailsTable" class="table">
+                <thead>
+                    <tr>
+                        <th>Chi tiết</th>
+                        <th>Giá trị</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" name="ProductDetails[0].DetailsName" class="form-control" /></td>
+                        <td><input type="text" name="ProductDetails[0].DetailsValue" class="form-control" /></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button type="button" class="btn btn-primary" id="addProductDetail">Thêm dòng mới</button>
+        </div>
     </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+    <div class="form-group">
+        <input type="submit" value="Thêm sản phẩm" class="btn btn-primary" />
+    </div>
+</form>
 
+@section Scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="~/lib/multiple-select/multiple-select.min.js"></script>
+    <link rel="stylesheet" href="~/lib/multiple-select/multiple-select.min.css" />
+
+    <script>
+        $(document).ready(function () {
+            // Initialize the multiple select plugin on the selectedCategories ListBox
+            $("#selectedCategories").multipleSelect({
+                selectAll: false,
+                keepOpen: false,
+                isOpen: false,
+            });
+
+            // Add product detail row
+            $('#addProductDetail').click(function () {
+                var index = $('#productDetailsTable tbody tr').length;
+
+                var newDetailRow = `<tr>
+                                    <td><input type="text" name="ProductDetails[` + index + `].DetailsName" class="form-control" /></td>
+                                    <td><input type="text" name="ProductDetails[` + index + `].DetailsValue" class="form-control" /></td>
+                                </tr>`;
+
+                $('#productDetailsTable').append(newDetailRow);
+            });
+
+            // Add variant row
+            $('#addVariant').click(function () {
+                var variantIndex = $('#variantsTable tbody tr').length;
+
+                var newVariantRow = `<tr>
+                                    <td>
+                                        <select class="form-control" name="Variants[` + variantIndex + `].Color">
+                                            <option value="Red">Red</option>
+                                            <option value="Green">Green</option>
+                                            <option value="Blue">Blue</option>
+                                            <option value="Black">Black</option>
+                                            <option value="White">White</option>
+                                            <option value="Yellow">Yellow</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select class="form-control" name="Variants[` + variantIndex + `].Size">
+                                            <option value="S">S</option>
+                                            <option value="M">M</option>
+                                            <option value="L">L</option>
+                                            <option value="XL">XL</option>
+                                            <option value="XXL">XXL</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="number" name="Variants[` + variantIndex + `].Quantity" class="form-control" />
+                                    </td>
+                                </tr>`;
+
+                $('#variantsTable').append(newVariantRow);
+            });
+
+            // Client-side validation for product details
+        @* $('#productForm').submit(function (e) {
+            var detailRows = $('#productDetailsTable tbody tr').length;
+            if (detailRows <= 1) { // Only the header row exists
+            alert('Vui lòng thêm ít nhất một chi tiết sản phẩm.');
+            e.preventDefault(); // Prevent form submission
+            }
+            }); *@
+                });
+    </script>
+    <partial name="_ValidationScriptsPartial" />
+}
