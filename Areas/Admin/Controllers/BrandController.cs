@@ -247,29 +247,26 @@ namespace XEDAPVIP.Areas.Admin.Controllers
             // Xác định đường dẫn tệp ảnh cần xoá
             var imagePath = Path.Combine(_hostingEnvironment.WebRootPath, brand.Image.TrimStart('/'));
 
-            // Kiểm tra xem tệp ảnh có tồn tại không trước khi xoá
-            if (System.IO.File.Exists(imagePath))
-            {
-                // Xoá tệp ảnh
-                System.IO.File.Delete(imagePath);
-            }
-
             // Check if any products reference this brand
             var isBrandInUse = await _context.Products.AnyAsync(p => p.BrandId == id);
             if (isBrandInUse)
             {
-                TempData["FailureMessage"] = "Brand is being used by some products and cannot be deleted!";
-                return RedirectToAction(nameof(Details), new { id = id });
+                TempData["ErrorMessage"] = "Brand đang được sử dụng bởi sản phẩm và không thể xoá.";
+                return RedirectToAction(nameof(Index));
             }
-
-            // If no products reference the brand, delete it
-            _context.Brands.Remove(brand);
-            await _context.SaveChangesAsync();
-
-            TempData["SuccessMessage"] = "Brand deleted successfully.";
-            return RedirectToAction(nameof(Index));
+            else
+            {
+                if (System.IO.File.Exists(imagePath))
+                {
+                    // Xoá tệp ảnh
+                    System.IO.File.Delete(imagePath);
+                }
+                _context.Brands.Remove(brand);
+                await _context.SaveChangesAsync();
+                TempData["StatusMessage"] = "Xoá Brand thành công.";
+                return RedirectToAction(nameof(Index));
+            }
         }
-
 
 
         private bool BrandExists(int id)

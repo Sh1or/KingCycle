@@ -271,20 +271,28 @@ namespace App.Areas_Admin_Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            if (id == null)
+            {
+                return NotFound();
+            }
             var category = await _context.Categories.FindAsync(id);
-
+            if (_context.ProductCategories.Any(p => p.CategoryId == id))
+            {
+                TempData["ErrorMessage"] = "Không thể xoá vì có sản phẩm tồn tại trong danh mục hiện tại.";
+                return RedirectToAction(nameof(Index));  // Redirect to Delete with error.
+            }
             // Check if Category has any related Products
             if (_context.ProductCategories.Any(p => p.CategoryId == id))
             {
-                TempData["StatusMessage"] = "Không thể xoá vì có sản phẩm tồn tại trong danh mục hiện tại.";
-                return RedirectToAction(nameof(Delete), new { id });  // Redirect to Delete with error.
+                TempData["ErrorMessage"] = "Không thể xoá vì có sản phẩm tồn tại trong danh mục hiện tại.";
+                return RedirectToAction(nameof(Index));  // Redirect to Delete with error.
             }
 
             // Check if Category has any sub categories
             if (_context.Categories.Any(c => c.ParentId == id))
             {
-                TempData["StatusMessage"] = "Không thể xoá vì có danh mục con trong danh mục hiện tại.";
-                return RedirectToAction(nameof(Delete), new { id });  // Redirect to Delete with error.
+                TempData["ErrorMessage"] = "Không thể xoá vì có danh mục con trong danh mục hiện tại.";
+                return RedirectToAction(nameof(Index));  // Redirect to Delete with error.
             }
 
             _context.Categories.Remove(category);
@@ -307,9 +315,6 @@ namespace App.Areas_Admin_Controllers
         {
             return _context.Categories.Any(e => e.Id == id);
         }
-
-
-
     }
 
 }
