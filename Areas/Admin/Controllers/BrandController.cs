@@ -130,7 +130,7 @@ namespace XEDAPVIP.Areas.Admin.Controllers
                         _context.Add(brand);
                         await _context.SaveChangesAsync();
 
-                        TempData["StatusMessage"] = "Thương hiệu đã được tạo thành công.";
+                        TempData["SuccessMessage"] = "Thương hiệu đã được tạo thành công.";
                         return RedirectToAction(nameof(Index));
                     }
                 }
@@ -198,6 +198,8 @@ namespace XEDAPVIP.Areas.Admin.Controllers
 
                     _context.Update(existingBrand);
                     await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Cập nhập Brand thành công.";
+
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -263,7 +265,7 @@ namespace XEDAPVIP.Areas.Admin.Controllers
                 }
                 _context.Brands.Remove(brand);
                 await _context.SaveChangesAsync();
-                TempData["StatusMessage"] = "Xoá Brand thành công.";
+                TempData["SuccessMessage"] = "Xoá Brand thành công.";
                 return RedirectToAction(nameof(Index));
             }
         }

@@ -230,9 +230,8 @@ namespace XEDAPVIP.Areas.Admin.Controllers
                     }
                 }
                 _context.Products.Add(newProduct);
+                TempData["SuccessMessage"] = "Sản phẩm đã được tạo thành công.";
                 await _context.SaveChangesAsync();
-
-                TempData["StatusMessage"] = "Sản phẩm đã được tạo thành công.";
                 return RedirectToAction(nameof(Index)); // Chuyển hướng về danh sách sản phẩm
             }
             catch (Exception e)
@@ -278,6 +277,8 @@ namespace XEDAPVIP.Areas.Admin.Controllers
                 {
                     _context.Update(product);
                     await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Cập nhập sản phẩm thành công.";
+
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -325,7 +326,10 @@ namespace XEDAPVIP.Areas.Admin.Controllers
             }
 
             await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Xoá Sản phẩm thành công.";
+
             return RedirectToAction(nameof(Index));
+
         }
 
         private bool ProductExists(int id)

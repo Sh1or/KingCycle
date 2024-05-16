@@ -123,6 +123,7 @@ namespace App.Areas_Admin_Controllers
                     category.ParentId = null;
                 _context.Add(category);
                 await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Đã tạo thành công danh mục.";  // Success message
                 return RedirectToAction(nameof(Index));
             }
 
@@ -152,7 +153,6 @@ namespace App.Areas_Admin_Controllers
             }
 
             ViewData["ParentId"] = new SelectList(await GetItemsSelectCategorie(), "Id", "Title", category.ParentId);
-
             return View(category);
         }
 
@@ -212,7 +212,7 @@ namespace App.Areas_Admin_Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["ParentId"] = new SelectList(await GetItemsSelectCategorie(), "Id", "Title", category.ParentId);
-            TempData["StatusMessage"] = "Đã cập nhật thành công danh mục.";  // Success message
+            TempData["SuccessMessage"] = "Đã cập nhật thành công danh mục.";  // Success message
             return RedirectToAction(nameof(Index));
         }
 
@@ -298,7 +298,7 @@ namespace App.Areas_Admin_Controllers
             _context.Categories.Remove(category);
             await _context.SaveChangesAsync();
 
-            TempData["StatusMessage"] = "Đã xóa thành công danh mục.";  // Success message
+            TempData["SuccessMessage"] = "Đã xóa thành công danh mục.";  // Success message
             return RedirectToAction(nameof(Index));
         }
         private bool HasChildCategories(Category category)
