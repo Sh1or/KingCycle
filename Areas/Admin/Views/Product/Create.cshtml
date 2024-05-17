@@ -1,7 +1,6 @@
 @model XEDAPVIP.Areas.Admin.Models.CreateProductModel
 @{
     ViewData["Title"] = "Create";
-
     var list = ViewData["categories"] as MultiSelectList;
 }
 
@@ -35,18 +34,13 @@
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <textarea asp-for="Description" class="form-control"></textarea>
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
                 <label asp-for="Price" class="control-label"></label>
-                <input asp-for="Price" class="form-control" />
+                <input asp-for="Price" class="form-control" value="" />
                 <span asp-validation-for="Price" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="DiscountPrice" class="control-label"></label>
-                <input asp-for="DiscountPrice" class="form-control" />
+                <input asp-for="DiscountPrice" class="form-control" value="" />
                 <span asp-validation-for="DiscountPrice" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -74,14 +68,7 @@
                 <tbody>
                     <tr>
                         <td>
-                            <select class="form-control" name="Variants[0].Color">
-                                <option value="Red">Red</option>
-                                <option value="Green">Green</option>
-                                <option value="Blue">Blue</option>
-                                <option value="Black">Black</option>
-                                <option value="White">White</option>
-                                <option value="Yellow">Yellow</option>
-                            </select>
+                            <input type="text" name="Variants[0].Color" class="form-control" />
                         </td>
                         <td>
                             <select class="form-control" name="Variants[0].Size">
@@ -93,7 +80,8 @@
                             </select>
                         </td>
                         <td>
-                            <input type="number" name="Variants[0].Quantity" class="form-control" />
+                            <input type="number" name="Variants[0].Quantity" class="form-control"
+                                style="width: 70px;" />
                         </td>
                     </tr>
                 </tbody>
@@ -118,6 +106,12 @@
             </table>
             <button type="button" class="btn btn-primary" id="addProductDetail">Thêm dòng mới</button>
         </div>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Description" class="control-label"></label>
+        <textarea asp-for="Description" id="productDescription" class="form-control"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
     </div>
 
     <div class="form-group">
@@ -148,7 +142,7 @@
                                                                 <td><input type="text" name="ProductDetails[` + index + `].DetailsValue" class="form-control" /></td>
                                                             </tr>`;
 
-                $('#productDetailsTable').append(newDetailRow);
+                $('#productDetailsTable tbody').append(newDetailRow);
             });
 
             // Add variant row
@@ -156,16 +150,7 @@
                 var variantIndex = $('#variantsTable tbody tr').length;
 
                 var newVariantRow = `<tr>
-                                                                <td>
-                                                                    <select class="form-control" name="Variants[` + variantIndex + `].Color">
-                                                                        <option value="Red">Red</option>
-                                                                        <option value="Green">Green</option>
-                                                                        <option value="Blue">Blue</option>
-                                                                        <option value="Black">Black</option>
-                                                                        <option value="White">White</option>
-                                                                        <option value="Yellow">Yellow</option>
-                                                                    </select>
-                                                                </td>
+                                                                <td><input type="text" name="Variants[` + variantIndex + `].Color" class="form-control" /></td>
                                                                 <td>
                                                                     <select class="form-control" name="Variants[` + variantIndex + `].Size">
                                                                         <option value="S">S</option>
@@ -175,14 +160,26 @@
                                                                         <option value="XXL">XXL</option>
                                                                     </select>
                                                                 </td>
-                                                                <td>
-                                                                    <input type="number" name="Variants[` + variantIndex + `].Quantity" class="form-control" />
-                                                                </td>
+                                                                <td><input type="number" name="Variants[` + variantIndex + `].Quantity" class="form-control" style="width: 70px;" /></td>
                                                             </tr>`;
 
-                $('#variantsTable').append(newVariantRow);
+                $('#variantsTable tbody').append(newVariantRow);
             });
 
+        });
+    </script>
+    <script>
+        tinymce.init({
+            selector: '#productDescription',
+            plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed linkchecker a11ychecker tinymcespellchecker permanentpen powerpaste advtable advcode editimage advtemplate ai mentions tinycomments tableofcontents footnotes mergetags autocorrect typography inlinecss markdown',
+            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+            tinycomments_mode: 'embedded',
+            tinycomments_author: 'Author name',
+            mergetags_list: [
+                { value: 'First.Name', title: 'First Name' },
+                { value: 'Email', title: 'Email' },
+            ],
+            ai_request: (request, respondWith) => respondWith.string(() => Promise.reject("See docs to implement AI Assistant")),
         });
     </script>
     <partial name="_ValidationScriptsPartial" />

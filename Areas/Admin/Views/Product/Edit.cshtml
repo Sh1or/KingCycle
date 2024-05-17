@@ -1,60 +1,173 @@
 @model App.Models.Product
-
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Product";
+    var categoriesList = ((MultiSelectList)ViewBag.categories).ToList();
 }
 
-<h1>Edit</h1>
+<h1>Edit Product</h1>
 
-<h4>Product</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Price" class="control-label"></label>
-                <input asp-for="Price" class="form-control" />
-                <span asp-validation-for="Price" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DiscountPrice" class="control-label"></label>
-                <input asp-for="DiscountPrice" class="form-control" />
-                <span asp-validation-for="DiscountPrice" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Slug" class="control-label"></label>
-                <input asp-for="Slug" class="form-control" />
-                <span asp-validation-for="Slug" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DateCreated" class="control-label"></label>
-                <input asp-for="DateCreated" class="form-control" />
-                <span asp-validation-for="DateCreated" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DateUpdated" class="control-label"></label>
-                <input asp-for="DateUpdated" class="form-control" />
-                <span asp-validation-for="DateUpdated" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+<form asp-action="Edit" asp-route-id="@Model.Id" enctype="multipart/form-data" method="post">
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Product</h4>
+            <hr />
+            <dl class="row">
+                <dt class="col-sm-4">
+                    @Html.LabelFor(model => model.Name)
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.EditorFor(model => model.Name)
+                </dd>
+                <dt class="col-sm-4">
+                    @Html.LabelFor(model => model.Price)
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.EditorFor(model => model.Price)
+                </dd>
+                <dt class="col-sm-4">
+                    @Html.LabelFor(model => model.DiscountPrice)
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.EditorFor(model => model.DiscountPrice)
+                </dd>
+                <dt class="col-sm-4">
+                    @Html.LabelFor(model => model.DateCreated)
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.DateCreated)
+                </dd>
+                <dt class="col-sm-4">
+                    @Html.LabelFor(model => model.DateUpdated)
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.DateUpdated)
+                </dd>
+                <dt class="col-sm-4">
+                    Thương hiệu
+                </dt>
+                <dd class="col-sm-8">
+                    <div class="form-group">
+                        <label asp-for="BrandId" class="control-label"></label>
+                        <select asp-for="BrandId" class="form-control" asp-items="@ViewBag.BrandList"></select>
+                        <span asp-validation-for="BrandId" class="text-danger"></span>
+                    </div>
+                </dd>
+                <dt class="col-sm-4">
+                    Main Image
+                </dt>
+                <dd class="col-sm-8">
+                    @if (!string.IsNullOrEmpty(Model.MainImage))
+                    {
+                        <img src="~/images/products/@Model.Slug/@Model.MainImage" alt="@Model.Name"
+                            style="max-width: 200px;" />
+                    }
+                    <input type="file" name="MainImage" />
+                </dd>
+                <dt class="col-sm-4">
+                    Sub Images
+                </dt>
+                <dd class="col-sm-8">
+                    @if (Model.SubImages != null && Model.SubImages.Any())
+                    {
+                        @foreach (var subImage in Model.SubImages)
+                        {
+                            <img src="~/images/products/@Model.Slug/subImg/@subImage" alt="@Model.Name"
+                                style="max-width: 100px;" />
+                        }
+                    }
+                    <input type="file" name="SubImages" multiple />
+                </dd>
+                <dt class="col-sm-4">
+                    Categories
+                </dt>
+                <dd class="col-sm-8">
+                    @* @if (Model.CategoryId != null && Model.CategoryId.Any())
+                    {
+                    @foreach (var categoryId in Model.CategoryId)
+                    {
+                    <input type="hidden" name="CategoryId" value="@categoryId" />
+                    }
+
+                    }
+                    <div class="form-group">
+                    <label class="control-label">Chọn danh mục</label>
+                    @Html.ListBoxFor(model => model.CategoryId, (MultiSelectList)ViewBag.categories, new
+                    {
+                    @class = "w-100",
+                    id = "selectedCategories"
+                    })
+                    </div> *@
+                </dd>
+            </dl>
+        </div>
+        <div class="col-md-6">
+            <h4>Specifications</h4>
+            <hr />
+            @if (Model.DetailsDictionary != null && Model.DetailsDictionary.Any())
+            {
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var detail in Model.DetailsDictionary)
+                        {
+                            <tr>
+                                <td>
+                                    <input type="text" name="DetailKeys" value="@detail.Key" class="form-control" />
+                                </td>
+                                <td>
+                                    <input type="text" name="DetailValues" value="@detail.Value" class="form-control" />
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p>No specifications available</p>
+            }
+        </div>
     </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+    <div class="row">
+        <div class="col-md-12">
+            <h4>Description</h4>
+            <hr />
+            <dl class="row">
+                <dt class="col-sm-2">
+                    @Html.LabelFor(model => model.Description)
+                </dt>
+                <dd class="col-sm-10">
+                    <label asp-for="Description" class="control-label"></label>
+                    <textarea asp-for="Description" id="productDescription" class="form-control"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                    @Html.EditorFor(model => model.Description)
+                </dd>
+            </dl>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <input type="submit" value="Save" class="btn btn-primary" />
+        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>
+<script>
+    tinymce.init({
+        selector: '#productDescription',
+        plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed linkchecker a11ychecker tinymcespellchecker permanentpen powerpaste advtable advcode editimage advtemplate ai mentions tinycomments tableofcontents footnotes mergetags autocorrect typography inlinecss markdown',
+        toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+        tinycomments_mode: 'embedded',
+        tinycomments_author: 'Author name',
+        mergetags_list: [
+            { value: 'First.Name', title: 'First Name' },
+            { value: 'Email', title: 'Email' },
+        ],
+        ai_request: (request, respondWith) => respondWith.string(() => Promise.reject("See docs to implement AI Assistant")),
+    });
+</script>
