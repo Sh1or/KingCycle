@@ -225,49 +225,252 @@ namespace XEDAPVIP.Areas.Admin.Controllers
             return await ReinitializeCreateView(product);
         }
 
-        // GET: Product/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        // GET: Admin/Product/Edit/5
+        public async Task<IActionResult> Edit(int id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var product = await _context.Products.Where(p => p.Id == id)
+                    .Include(p => p.Variants)
+                    .Include(p => p.Brand)
+                    .Include(p => p.ProductCategories)
+                    .ThenInclude(c => c.Category).FirstOrDefaultAsync();
+
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            ViewBag.BrandList = new SelectList(_context.Brands, "Id", "Name");
+            var selectedCates = product.ProductCategories.Select(c => c.CategoryId).ToArray();
+            var categories = await _context.Categories.ToListAsync();
+            ViewData["categories"] = new MultiSelectList(categories, "Id", "Title");
+
+            var model = new CreateProductModel
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                Price = product.Price,
+                DiscountPrice = product.DiscountPrice,
+                Slug = product.Slug,
+                MainImage = product.MainImage,
+                SubImages = product.SubImages,
+                BrandId = product.BrandId,
+                CategoryId = product.ProductCategories.Select(pc => pc.CategoryId).ToArray(),
+                Variants = product.Variants.Select(v => new ProductVariant
+                {
+                    Color = v.Color,
+                    Size = v.Size,
+                    Quantity = v.Quantity
+                }).ToList(),
+                DetailsDictionary = product.DetailsDictionary // Adjust if necessary
+            };
+
+            return View(model);
+        }
+
+
+
+
+        // POST: Admin/Product/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, CreateProductModel product, IFormFile mainImage, List<IFormFile> subImages, List<ProductVariant> variants)
+        {
+            var categories = await _context.Categories.ToListAsync();
+            ViewData["categories"] = new MultiSelectList(categories, "Id", "Title");
+            if (id != product.Id)
+            {
+                return NotFound();
+            }
+            product.Slug = Utils.GenerateSlug(product.Name);
+            ModelState.SetModelValue("Slug", new ValueProviderResult(product.Slug));
+
+            ModelState.Clear();
+            TryValidateModel(product);
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var existingProduct = await _context.Products.Where(p => p.Id == id)
+                        .Include(p => p.Variants)
+                        .Include(p => p.Brand)
+                        .Include(p => p.ProductCategories)
+                        .ThenInclude(c => c.Category)
+                        .FirstOrDefaultAsync();
+
+                    if (existingProduct == null)
+                    {
+                        return NotFound();
+                    }
+
+                    existingProduct.Name = product.Name;
+                    existingProduct.Description = product.Description;
+                    existingProduct.Price = product.Price;
+                    existingProduct.DiscountPrice = product.DiscountPrice;
+                    existingProduct.BrandId = product.BrandId;
+                    existingProduct.Slug = product.Slug;
+                    existingProduct.DateUpdated = DateTime.Now;
+
+                    // Update categories
+                    if (product.CategoryId == null) product.CategoryId = new int[] { };
+                    var oldCategoriesId = existingProduct.ProductCategories.Select(c => c.CategoryId).ToArray();
+                    var newCategoriesId = product.CategoryId;
+
+                    var removeCategories = from productCate in existingProduct.ProductCategories
+                                           where !newCategoriesId.Contains(productCate.CategoryId)
+                                           select productCate;
+                    _context.ProductCategories.RemoveRange(removeCategories);
+
+                    var addCateId = from cateIDs in newCategoriesId
+                                    where !oldCategoriesId.Contains(cateIDs)
+                                    select cateIDs;
+
+                    foreach (var cateId in addCateId)
+                    {
+                        _context.ProductCategories.Add(new ProductCategory
+                        {
+                            ProductId = id,
+                            CategoryId = cateId
+                        });
+                    }
+
+                    // Update product variants
+                    UpdateProductVariants(existingProduct, variants);
+
+                    // Update product details
+                    var detailsDictionary = product.ProductDetails.ToDictionary(d => d.DetailsName, d => d.DetailsValue);
+                    existingProduct.DetailsJson = JsonConvert.SerializeObject(detailsDictionary);
+
+                    // Update main image
+                    if (mainImage != null && mainImage.Length > 0)
+                    {
+                        UpdateMainImage(existingProduct, mainImage);
+                    }
+
+                    // Update sub images
+                    if (subImages != null && subImages.Count > 0)
+                    {
+                        UpdateSubImages(existingProduct, subImages);
+                    }
+
+                    _context.Update(existingProduct);
+                    await _context.SaveChangesAsync();
+
+                    TempData["SuccessMessage"] = "Sản phẩm đã được cập nhật thành công.";
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!ProductExists(product.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError(string.Empty, $"Đã xảy ra lỗi khi cập nhật sản phẩm: {ex.Message}");
+                }
+            }
+
+            ViewBag.BrandList = new SelectList(_context.Brands, "Id", "Name", product.BrandId);
+            ViewData["categories"] = new MultiSelectList(categories, "Id", "Title", product.CategoryId);
+
+            return View(product);
+        }
+
+
+
+
+        // Update product variants
+        private void UpdateProductVariants(Product existingProduct, List<ProductVariant> newVariants)
+        {
+            // Get existing variants from database
+            var existingVariants = _context.productVariants.Where(v => v.ProductId == existingProduct.Id).ToList();
+
+            // Create a list to track variants to remove
+            var variantsToRemove = existingVariants.Where(ev => !newVariants.Any(nv => nv.Id == ev.Id)).ToList();
+            _context.productVariants.RemoveRange(variantsToRemove);
+
+            // Update or add new variants
+            foreach (var newVariant in newVariants)
+            {
+                var existingVariant = existingVariants.FirstOrDefault(ev => ev.Id == newVariant.Id);
+
+                if (existingVariant != null)
+                {
+                    // Update existing variant
+                    existingVariant.Color = newVariant.Color;
+                    existingVariant.Size = newVariant.Size;
+                    existingVariant.Quantity = newVariant.Quantity;
+                }
+                else
+                {
+                    // Add new variant
+                    existingProduct.Variants.Add(newVariant);
+                }
+            }
+        }
+        // Update main image
+        private void UpdateMainImage(Product product, IFormFile mainImage)
+        {
+            var directoryPath = Path.Combine(_hostingEnvironment.WebRootPath, "images", "products", product.Slug);
+            Directory.CreateDirectory(directoryPath);
+
+            var path = Path.Combine(directoryPath, mainImage.FileName);
+            using (var stream = new FileStream(path, FileMode.Create))
+            {
+                mainImage.CopyTo(stream);
+            }
+            product.MainImage = mainImage.FileName;
+        }
+
+        // Update sub images
+        private void UpdateSubImages(Product product, List<IFormFile> subImages)
+        {
+            product.SubImages = new List<string>();
+            foreach (var image in subImages)
+            {
+                if (image.Length > 0)
+                {
+                    var fileDirectoryName = Path.Combine(_hostingEnvironment.WebRootPath, "images", "products", product.Slug, "subImg");
+                    Directory.CreateDirectory(fileDirectoryName);
+
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
+                    var filePath = Path.Combine(fileDirectoryName, fileName);
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        image.CopyTo(stream);
+                    }
+                    product.SubImages.Add(fileName);
+                }
+            }
+        }
+
+        // Reinitialize edit view
+        private async Task<IActionResult> ReinitializeEditView(int? id, Product product)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var product = await _context.Products
-                .Include(p => p.Brand)
-                .Include(p => p.ProductCategories)
-                    .ThenInclude(pc => pc.Category)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-
             var brands = await _context.Brands.ToListAsync();
             ViewBag.BrandList = new SelectList(brands, "Id", "Name", product.BrandId);
 
             var categories = await _context.Categories.ToListAsync();
-            ViewData["categories"] = new MultiSelectList(categories, "Id", "Title");
+            ViewData["categories"] = new MultiSelectList(categories, "Id", "Title", product.ProductCategories.Select(pc => pc.CategoryId));
 
-            return View(product);
+            return View("Edit", product);
         }
-
-
-
-        // POST: Product/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Product product)
-        {
-
-
-            return View(product);
-        }
-
-
-
-
 
         private bool ProductExists(int id)
         {

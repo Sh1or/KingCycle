@@ -13,29 +13,31 @@
 <div class="row">
     @foreach (var item in Model)
     {
-        <div class="col-sm-4">
-            <div class="card" style="width: 18rem; margin-bottom: 20px;">
-                <img src="~/images/products/@item.Slug/@item.MainImage" class="card-img-top" alt="Product Image">
-                <div class="card-body">
-                    <h5 class="card-title">@Html.DisplayFor(modelItem => item.Name)</h5>
-                    <h6>
-                        @if (item.DiscountPrice.HasValue)
-                        {
-                            <span style="text-decoration: line-through;">@Html.DisplayFor(modelItem => item.Price)</span>
-                            <br />
-                            <span>@Html.DisplayFor(modelItem => item.DiscountPrice)</span>
-                        }
-                        else
-                        {
-                            <span>@Html.DisplayFor(modelItem => item.Price)</span>
-                        }
-                    </h6>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary">Edit</a>
-                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-secondary">Details</a>
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
+        <a asp-action="Details" asp-route-id="@item.Id" class="text-center">
+            <div class=" col-sm-4">
+                <div class="card" style="width: 18rem; margin-bottom: 20px;">
+                    <img src="~/images/products/@item.Slug/@item.MainImage" class="card-img-top" alt="Product Image">
+                    <div class="card-body">
+                        <h5 class="card-title">@Html.DisplayFor(modelItem => item.Name)</h5>
+                        <h6>
+                            @if (item.DiscountPrice.HasValue)
+                            {
+                                <span style="text-decoration: line-through;">@Html.DisplayFor(modelItem => item.Price)</span>
+                                <br />
+                                <span>@Html.DisplayFor(modelItem => item.DiscountPrice)</span>
+                            }
+                            else
+                            {
+                                <span>@Html.DisplayFor(modelItem => item.Price)</span>
+                            }
+                        </h6>
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
+                    </div>
                 </div>
             </div>
-        </div>
+        </a>
+
     }
 </div>
 
