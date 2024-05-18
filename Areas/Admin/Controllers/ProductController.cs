@@ -517,5 +517,63 @@ namespace XEDAPVIP.Areas.Admin.Controllers
 
             return View("Create", product);
         }
+
+        // GET: Admin/Post/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var product = await _context.Products.Where(p => p.Id == id)
+                    .Include(p => p.Variants)
+                    .Include(p => p.Brand)
+                    .Include(p => p.ProductCategories)
+                    .ThenInclude(c => c.Category).FirstOrDefaultAsync();
+
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            return View(product);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var product = await _context.Products.Where(p => p.Id == id)
+                  .Include(p => p.Variants)
+                  .Include(p => p.Brand)
+                  .Include(p => p.ProductCategories)
+                  .ThenInclude(c => c.Category).FirstOrDefaultAsync();
+
+            // Lấy thông tin đường dẫn tới file hình ảnh chính và các hình ảnh phụ
+            var mainImagePath = product.MainImage;
+            var subImagePaths = product.SubImages; // Giả sử hình ảnh phụ được lưu trong thuộc tính SubImages 
+
+            // Xóa file hình ảnh chính và các hình ảnh phụ
+            if (!string.IsNullOrEmpty(mainImagePath) && System.IO.File.Exists(mainImagePath))
+            {
+                System.IO.File.Delete(mainImagePath);
+            }
+
+            if (subImagePaths != null)
+            {
+                foreach (var imagePath in subImagePaths)
+                {
+                    if (System.IO.File.Exists(imagePath))
+                    {
+                        System.IO.File.Delete(imagePath);
+                    }
+                }
+            }
+
+            _context.Products.Remove(product);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
