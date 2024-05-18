@@ -12,6 +12,7 @@ namespace XEDAPVIP.Areas.Admin.Models
         [Display(Name = "Danh mục")]
         public int[]? CategoryId { get; set; }
         public List<ProductDetailEntry> ProductDetails { get; set; }
+
     }
 
     public class ProductDetailEntry
