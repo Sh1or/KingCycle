@@ -1,8 +1,4 @@
-﻿@using App.Components
-@{
-    List<Category> categories = ViewBag.category as List<Category>;
-}
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -69,8 +65,8 @@
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="navbar-nav">
                             <li class="nav-item category-product">
-                                <a class="nav-link text-light" asp-area="" asp-controller="Home"
-                                    asp-action="Product">SẢN PHẨM</a>
+                                <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Product"
+                                    asp-route-slug=" ">SẢN PHẨM</a>
                                 <div class="categorypopup">
                                     @RenderSection("Popup", false)
                                 </div>

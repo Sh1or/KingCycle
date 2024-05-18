@@ -1,7 +1,8 @@
 @using App.Components
 @{
-    ViewData["Title"] = "Product";
-    List<Category> categories = ViewBag.category as List<Category>;
+    List<Category> categories = ViewBag.categories as List<Category>;
+    Category category = ViewBag.category as Category;
+    ViewData["Title"] = (category != null) ? category.Title : "Tất Cả Sản Phẩm";
 }
 
 @section Popup {
@@ -11,7 +12,16 @@
 {
     Categories = categories,
     level = 0,
-    categorieslug = ViewBag.categorySlug
+    slugCategory = ViewBag.categoryslug
 
 })
+}
+
+@if (category != null)
+{
+    <p>@category.Slug</p>
+}
+else
+{
+    <p>Tất cả sản phẩm</p>
 }

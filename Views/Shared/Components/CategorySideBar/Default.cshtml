@@ -6,22 +6,23 @@
 
 @if (Model.Categories.Count > 0)
 {
+
     <div class="category-container d-flex justify-content-start ">
-        @foreach (var category in Model.Categories)
+        @foreach (var item in Model.Categories)
         {
-            @if (category.ParentCategory == null)
+            @if (item.ParentCategory == null)
             {
                 <div class="collum">
-                    <h6>@category.Title</h6>
+                    <h6>@item.Title</h6>
                     <hr />
-                    @if (category.CategoryChildren?.Count > 0)
+                    @if (item.CategoryChildren?.Count > 0)
                     {
                         <ul class="category-popup">
-                            @foreach (var childCategory in category.CategoryChildren)
+                            @foreach (var itemchild in item.CategoryChildren)
                             {
                                 <li>
-                                    <a asp-controller="Home" asp-action="Index" asp-route-categorySlug="@childCategory.Slug">
-                                        @childCategory.Title
+                                    <a asp-controller="Home" asp-action="Product" asp-route-categoryslug="@itemchild.Slug">
+                                        @itemchild.Title
                                     </a>
                                 </li>
                                 <hr />
@@ -33,7 +34,9 @@
             }
         }
     </div>
+
 }
+
 <style>
     .category-container {
         display: flex;
@@ -53,11 +56,11 @@
 
     .categorypopup {
         position: fixed;
-        top: 40%;
+        top: 38%;
         left: 50%;
         transform: translate(-50%, -50%);
         z-index: 1000;
-        display: none;
+        display: block;
         background-color: white;
         padding: 10px;
     }

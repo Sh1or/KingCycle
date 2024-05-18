@@ -5,9 +5,8 @@
 
 @{
 
-    List<Category> categories = ViewBag.category as List<Category>;
+    List<Category> categories = ViewBag.categories as List<Category>;
 }
-
 @section Popup {
 
     @await Component.InvokeAsync("App.Components.CategorySideBar",
@@ -15,7 +14,7 @@
 {
     Categories = categories,
     level = 0,
-    categorieslug = ViewBag.categorySlug
+    slugCategory = ViewBag.categorySlug
 
 })
 }

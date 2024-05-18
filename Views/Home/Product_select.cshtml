@@ -5,9 +5,8 @@
 
 @{
 
-    List<Category> categories = ViewBag.category as List<Category>;
+    List<Category> categories = ViewBag.categories as List<Category>;
 }
-
 @section Popup {
 
     @await Component.InvokeAsync("App.Components.CategorySideBar",
@@ -15,7 +14,7 @@
 {
     Categories = categories,
     level = 0,
-    categorieslug = ViewBag.categorySlug
+    slugCategory = ViewBag.categorySlug
 
 })
 }
@@ -364,7 +363,8 @@
                             ý các âm thanh lạ khi đạp xe, <span style="color: #00ccff;"><a style="color: #00ccff;"
                                     href="https://xedap.vn/cach-bom-xe-dap/" target="_blank"
                                     rel="noopener noreferrer">bơm lốp xe</a></span> nếu nhận thấy lốp bị mềm, luôn dựng
-                            xe theo phương thẳng đứng, để xe trong nhà thay vì ngoài trời.</p>
+                            xe theo phương thẳng đứng, để xe trong nhà thay vì ngoài trời.
+                        </p>
                     </div>
                 </div>
             </div>
