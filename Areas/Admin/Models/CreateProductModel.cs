@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using App.Models;
 
-namespace XEDAPVIP.Areas.Admin.Models
+namespace XEDAPVIP.Areas.Admin.ModelsProduct
 {
     public class CreateProductModel : Product
     {

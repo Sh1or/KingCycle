@@ -1,13 +1,12 @@
 @model IEnumerable<App.Models.Product>
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Sản phẩm";
 }
 
-<h1>Index</h1>
 <partial name="_StatusMessage" />
 
 <p>
-    <a asp-action="Create" class="btn btn-primary">Create New</a>
+    <a asp-action="Create" class="btn btn-primary">Thêm sản phẩm</a>
 </p>
 <p>
     Số lượng sản phẩm: @Model.Count()
@@ -46,7 +45,10 @@
 
     }
 </div>
-<partial name="_PagingXTL" model="@ViewBag.pagingmodel" />
+<div class="justify-content-center d-flex">
+    <partial name="_PagingXTL" model="@ViewBag.pagingmodel" />
+
+</div>
 
 <div id="warning-popup" class="popup">
     <div class="popup-content">

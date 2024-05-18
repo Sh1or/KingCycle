@@ -1,6 +1,24 @@
 ﻿@{
     ViewData["Title"] = "Privacy Policy";
 }
+@using App.Components
+
+@{
+
+    List<Category> categories = ViewBag.category as List<Category>;
+}
+
+@section Popup {
+
+    @await Component.InvokeAsync("App.Components.CategorySideBar",
+        new CategorySideBar.CategorySideBarData()
+{
+    Categories = categories,
+    level = 0,
+    categorieslug = ViewBag.categorySlug
+
+})
+}
 
 <body>
     <div class="content_main_bicycle">

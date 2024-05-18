@@ -1,6 +1,24 @@
 @{
     ViewData["Title"] = "Check Out Page";
 }
+@using App.Components
+
+@{
+
+    List<Category> categories = ViewBag.category as List<Category>;
+}
+
+@section Popup {
+
+    @await Component.InvokeAsync("App.Components.CategorySideBar",
+        new CategorySideBar.CategorySideBarData()
+{
+    Categories = categories,
+    level = 0,
+    categorieslug = ViewBag.categorySlug
+
+})
+}
 
 <body>
     <div style="padding-bottom: 200px;" class="cart_shop">

@@ -1,8 +1,24 @@
-﻿@{
+﻿@using App.Components
+
+@{
     ViewData["Title"] = "KINGCYCLE";
+    List<Category> categories = ViewBag.category as List<Category>;
+}
+
+@section Popup {
+
+    @await Component.InvokeAsync("App.Components.CategorySideBar",
+        new CategorySideBar.CategorySideBarData()
+{
+    Categories = categories,
+    level = 0,
+    categorieslug = ViewBag.categorySlug
+
+})
 }
 
 <body>
+
     <div style="  background-color: #1b6ec2;;" class="sliders">
         <div class="slider">
             <div class="list">
@@ -23,8 +39,9 @@
                 </div>
             </div>
             <div class="buttons">
-                <button id="prev"><</button>
-                <button id="next">></button>
+                <button id="prev">
+                    < </button>
+                        <button id="next">></button>
             </div>
             <ul class="dots">
                 <li class="active"></li>
@@ -255,8 +272,10 @@
                             </div>
                             <div class="slider">
                                 <div class="buttons">
-                                    <button class="prev"><</button>
-                                    <button class="next">></button>
+                                    <button class="prev">
+                                        < </button>
+
+                                            <button class="next">></button>
                                 </div>
                             </div>
                         </div>
@@ -419,8 +438,9 @@
                             </div>
                             <div class="slider">
                                 <div class="buttons">
-                                    <button class="prev"><</button>
-                                    <button class="next">></button>
+                                    <button class="prev">
+                                        < </button>
+                                            <button class="next">></button>
                                 </div>
                             </div>
                         </div>
@@ -583,8 +603,9 @@
                             </div>
                             <div class="slider">
                                 <div class="buttons">
-                                    <button class="prev"><</button>
-                                    <button class="next">></button>
+                                    <button class="prev">
+                                        < </button>
+                                            <button class="next">></button>
                                 </div>
                             </div>
                         </div>
@@ -747,8 +768,9 @@
                             </div>
                             <div class="slider">
                                 <div class="buttons">
-                                    <button class="prev"><</button>
-                                    <button class="next">></button>
+                                    <button class="prev">
+                                        < </button>
+                                            <button class="next">></button>
                                 </div>
                             </div>
                         </div>
@@ -911,8 +933,10 @@
                             </div>
                             <div class="slider slider-main">
                                 <div class="buttons">
-                                    <button class="prev"><</button>
-                                    <button class="next">></button>
+                                    <button class="prev">
+                                        < </button>
+
+                                            <button class="next">></button>
                                 </div>
                             </div>
                         </div>
@@ -995,8 +1019,8 @@
                 </div>
             </div>
         </div>
+
     </div>
-    <script src="~/js/slider.js"asp-append-version="true"></script>
-    <script src="~/js/slider_product.js"asp-append-version="true"></script>
-    
+    <script src="~/js/slider.js" asp-append-version="true"></script>
+    <script src="~/js/slider_product.js" asp-append-version="true"></script>
 </body>

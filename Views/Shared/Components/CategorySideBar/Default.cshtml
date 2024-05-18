@@ -1,0 +1,88 @@
+@using App.Components
+@model App.Components.CategorySideBar.CategorySideBarData
+@{
+    int level = Model.level;
+}
+
+@if (Model.Categories.Count > 0)
+{
+    <div class="category-container d-flex justify-content-start ">
+        @foreach (var category in Model.Categories)
+        {
+            @if (category.ParentCategory == null)
+            {
+                <div class="collum">
+                    <h6>@category.Title</h6>
+                    <hr />
+                    @if (category.CategoryChildren?.Count > 0)
+                    {
+                        <ul class="category-popup">
+                            @foreach (var childCategory in category.CategoryChildren)
+                            {
+                                <li>
+                                    <a asp-controller="Home" asp-action="Index" asp-route-categorySlug="@childCategory.Slug">
+                                        @childCategory.Title
+                                    </a>
+                                </li>
+                                <hr />
+
+                            }
+                        </ul>
+                    }
+                </div>
+            }
+        }
+    </div>
+}
+<style>
+    .category-container {
+        display: flex;
+        text-align: left;
+        justify-content: center;
+        gap: 80px;
+    }
+
+    .collum {
+        position: relative;
+        width: 150px;
+    }
+
+    .collum h5 {
+        margin-bottom: 10px;
+    }
+
+    .categorypopup {
+        position: fixed;
+        top: 40%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1000;
+        display: none;
+        background-color: white;
+        padding: 10px;
+    }
+
+
+    .category-product {
+        position: relative;
+    }
+
+    .categorypopup ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .categorypopup li {
+        padding: 8px 16px;
+    }
+
+    .categorypopup li a {
+        text-decoration: none;
+        color: #333;
+    }
+
+    .categorypopup li a:hover {
+        color: #007bff;
+    }
+</style>

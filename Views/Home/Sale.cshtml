@@ -1,7 +1,24 @@
 @{
     ViewData["Title"] = "Sale Page";
 }
+@using App.Components
 
+@{
+   
+    List<Category> categories = ViewBag.category as List<Category>;
+}
+
+@section Popup {
+
+    @await Component.InvokeAsync("App.Components.CategorySideBar",
+        new CategorySideBar.CategorySideBarData()
+{
+    Categories = categories,
+    level = 0,
+    categorieslug = ViewBag.categorySlug
+
+})
+}
 <body>
     <div style="  background-color: #1b6ec2;;" class="sliders">
         <div class="slider">

@@ -10,11 +10,11 @@ using App.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using App.Utilities;
-using XEDAPVIP.Areas.Admin.Models;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using System.IO;
+using XEDAPVIP.Areas.Admin.ModelsProduct;
 
 namespace XEDAPVIP.Areas.Admin.Controllers
 {
@@ -37,7 +37,7 @@ namespace XEDAPVIP.Areas.Admin.Controllers
         {
             var products = _context.Products.OrderByDescending(p => p.DateCreated);
             int totalProduc = await products.CountAsync();
-            if (pagesize <= 0) pagesize = 10;
+            if (pagesize <= 0) pagesize = 9;
             int countPages = (int)Math.Ceiling((double)totalProduc / pagesize);
             if (currentPage > countPages)
                 currentPage = countPages;

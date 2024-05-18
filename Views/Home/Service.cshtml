@@ -1,5 +1,23 @@
+@using App.Components
 @{
     ViewData["Title"] = "Service Shop";
+}
+
+@{
+
+    List<Category> categories = ViewBag.category as List<Category>;
+}
+
+@section Popup {
+
+    @await Component.InvokeAsync("App.Components.CategorySideBar",
+        new CategorySideBar.CategorySideBarData()
+{
+    Categories = categories,
+    level = 0,
+    categorieslug = ViewBag.categorySlug
+
+})
 }
 
 <body>
