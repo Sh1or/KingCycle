@@ -4,6 +4,7 @@ using App.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace XEDAPVIP.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240514102649_v1.4.2")]
+    partial class v142
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -129,41 +132,6 @@ namespace XEDAPVIP.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
-            modelBuilder.Entity("App.Models.Brand", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DateUpdated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Image")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Slug")
-                        .HasMaxLength(160)
-                        .HasColumnType("nvarchar(160)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Brands");
-                });
-
             modelBuilder.Entity("App.Models.Category", b =>
                 {
                     b.Property<int>("Id")
@@ -180,6 +148,7 @@ namespace XEDAPVIP.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Slug")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -193,8 +162,7 @@ namespace XEDAPVIP.Migrations
                     b.HasIndex("ParentId");
 
                     b.HasIndex("Slug")
-                        .IsUnique()
-                        .HasFilter("[Slug] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("Category");
                 });
@@ -436,6 +404,41 @@ namespace XEDAPVIP.Migrations
                     b.ToTable("UserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("XEDAPVIP.Models.Brand", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateUpdated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Image")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Slug")
+                        .HasMaxLength(160)
+                        .HasColumnType("nvarchar(160)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Brands");
+                });
+
             modelBuilder.Entity("App.Models.Address", b =>
                 {
                     b.HasOne("App.Models.AppUser", "User")
@@ -458,7 +461,7 @@ namespace XEDAPVIP.Migrations
 
             modelBuilder.Entity("App.Models.Product", b =>
                 {
-                    b.HasOne("App.Models.Brand", "Brand")
+                    b.HasOne("XEDAPVIP.Models.Brand", "Brand")
                         .WithMany("Products")
                         .HasForeignKey("BrandId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -548,11 +551,6 @@ namespace XEDAPVIP.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("App.Models.Brand", b =>
-                {
-                    b.Navigation("Products");
-                });
-
             modelBuilder.Entity("App.Models.Category", b =>
                 {
                     b.Navigation("CategoryChildren");
@@ -565,6 +563,11 @@ namespace XEDAPVIP.Migrations
                     b.Navigation("ProductCategories");
 
                     b.Navigation("Variants");
+                });
+
+            modelBuilder.Entity("XEDAPVIP.Models.Brand", b =>
+                {
+                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }
