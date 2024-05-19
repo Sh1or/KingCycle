@@ -184,6 +184,36 @@ public class HomeController : Controller
         return View(productinPage);
     }
 
+    [Route("/product/{categoryslug?}/{brandslug?}/{productslug?}")]
+    public IActionResult Product_information(string categoryslug, string brandslug, string productslug)
+    {
+        var categories = GetCategories();
+        var brands = GetBrands();
+
+        ViewBag.categories = categories;
+        ViewBag.categoryslug = categoryslug;
+        ViewBag.brands = brands;
+        ViewBag.brandslug = brandslug;
+
+        if (string.IsNullOrEmpty(productslug))
+        {
+            return NotFound("Product not found");
+        }
+
+        var product = _context.Products
+                              .Include(p => p.Brand)
+                              .Include(p => p.ProductCategories)
+                              .Include(p => p.Variants) // Include the variants
+                              .FirstOrDefault(p => p.Slug == productslug);
+
+        if (product == null)
+        {
+            return NotFound("Product not found");
+        }
+
+        return View(product);
+    }
+
 
     public IActionResult Privacy(string categoryslug, string brandslug)
     {
@@ -241,35 +271,6 @@ public class HomeController : Controller
         ViewBag.brands = brands;
         ViewBag.brandslug = brandslug;
         return View();
-    }
-    [Route("/product/{categoryslug?}/{brandslug?}/{productslug?}")]
-    public IActionResult Product_information(string categoryslug, string brandslug, string productslug)
-    {
-        var categories = GetCategories();
-        var brands = GetBrands();
-
-        ViewBag.categories = categories;
-        ViewBag.categoryslug = categoryslug;
-        ViewBag.brands = brands;
-        ViewBag.brandslug = brandslug;
-
-        if (string.IsNullOrEmpty(productslug))
-        {
-            return NotFound("Product not found");
-        }
-
-        var product = _context.Products
-                              .Include(p => p.Brand)
-                              .Include(p => p.ProductCategories)
-                              .Include(p => p.Variants) // Include the variants
-                              .FirstOrDefault(p => p.Slug == productslug);
-
-        if (product == null)
-        {
-            return NotFound("Product not found");
-        }
-
-        return View(product);
     }
 
     public IActionResult Product_select(string categoryslug, string brandslug)
