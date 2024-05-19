@@ -1,14 +1,14 @@
 @model XEDAPVIP.Areas.Admin.ModelsProduct.CreateProductModel
 @{
-    ViewData["Title"] = "Chỉnh Sửa Sản Phẩm";
+    ViewData["Title"] = "Edit Product";
 }
 
-
+<h1>Edit Product</h1>
 
 <form asp-action="Edit" asp-route-id="@Model.Id" enctype="multipart/form-data" method="post">
     <div class="row">
         <div class="col-md-6">
-            <h4>Sản Phẩm</h4>
+            <h4>Product</h4>
             <hr />
             <dl class="row">
                 <dt class="col-sm-4">
@@ -40,7 +40,7 @@
                     @Html.ValidationMessageFor(model => model.BrandId, "", new { @class = "text-danger" })
                 </dd>
                 <dt class="col-sm-4">
-                    Ảnh Chính
+                    Main Image
                 </dt>
                 <dd class="col-sm-8">
                     <div id="mainImagePreviewContainer">
@@ -53,7 +53,7 @@
                     <input type="file" name="MainImage" id="mainImageInput" />
                 </dd>
                 <dt class="col-sm-4">
-                    Ảnh Phụ
+                    Sub Images
                 </dt>
                 <dd class="col-sm-8">
                     <div id="subImagesContainer">
@@ -95,7 +95,7 @@
             </dl>
         </div>
         <div class="col-md-6">
-            <h4>Thông Số Kỹ Thuật</h4>
+            <h4>Specifications</h4>
             <hr />
             <dt class="col-sm-4">
                 Variants

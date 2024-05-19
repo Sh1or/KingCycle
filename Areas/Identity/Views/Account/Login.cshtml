@@ -20,7 +20,9 @@
 </div>
 <div class="login">
     <div class="logo-container">
-        <img src="/image/logo.png" alt="LOGO"/>
+        <a asp-area="" asp-controller="Home" asp-action="Index">
+        <img src="/images/logo.png" alt="LOGO"/>
+        </a>
         <h1 class="app-title">@ViewData["Title"].</h1>
     </div>
 
@@ -87,7 +89,8 @@
                                                         break;
                                                     case "Facebook":
                                                         <i class="fa-brands fa-facebook-f"> </i> <!-- Sử dụng font awesome icon -->
-                                                        break;                                                        default:
+                                                        break;                                                        
+                                                    default:
                                                         @provider.Name <!-- Hiển thị tên nhà cung cấp nếu không có icon -->
                                                         break;
                                                 }
