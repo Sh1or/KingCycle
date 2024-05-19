@@ -116,6 +116,7 @@
                 </dd>
             </dl>
         </div>
+
         <div class="col-md-6">
             <h4>Thông Số Kĩ Thuật</h4>
             <hr />
@@ -143,7 +144,36 @@
             {
                 <p>No specifications available</p>
             }
+            <h4>Biến Thể Sản Phẩm</h4>
+            <hr />
+            @if (Model.Variants != null && Model.Variants.Any())
+            {
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Màu Sắc</th>
+                            <th>Kích Thước</th>
+                            <th>Số Lượng</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var variant in Model.Variants)
+                        {
+                            <tr>
+                                <td>@variant.Color</td>
+                                <td>@variant.Size</td>
+                                <td>@variant.Quantity</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p>No variants available</p>
+            }
         </div>
+    </div>
     </div>
 
     <div class="row">
