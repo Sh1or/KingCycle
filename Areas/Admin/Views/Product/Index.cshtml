@@ -123,7 +123,7 @@
     </p>
     <hr>
     <p>
-        Số lượng sản phẩm: @Model.Count()
+        Số lượng sản phẩm: @ViewBag.countproduct 
     </p>
     <div class="row">
 
@@ -174,7 +174,7 @@
 
         }
     </div>
-    <div class="justify-content-center d-flex">
+    <div class="justify-content-center d-flex mt-5 ps-3 pe-3">
         <partial name="_PagingXTL" model="@ViewBag.pagingmodel" />
 
     </div>
