@@ -115,7 +115,7 @@ public class HomeController : Controller
     }
 
     [Route("/product/{slug?}")]
-    public async Task<IActionResult> Product(string categoryslug, string brandslug)
+    public async Task<IActionResult> Product(string categoryslug, string brandslug, [FromQuery(Name = "p")] int currentPage, int pagesize)
     {
         var categories = GetCategories();
         var brands = GetBrands();
@@ -158,8 +158,30 @@ public class HomeController : Controller
 
         products = products.OrderByDescending(p => p.DateCreated);
 
+        int totalProduc = products.Count();
+        if (pagesize <= 0) pagesize = 9;
+        int countPages = (int)Math.Ceiling((double)totalProduc / pagesize);
+        if (currentPage > countPages)
+            currentPage = countPages;
+        if (currentPage < 1)
+            currentPage = 1;
+        var pagingmodel = new PagingModel()
+        {
+            countpages = countPages,
+            currentpage = currentPage,
+            generateUrl = (pageNumber) => Url.Action("Product", new
+            {
+                p = pageNumber,
+                pagesize = pagesize
+            })
+        };
+        var productinPage = products.Skip((currentPage - 1) * pagesize)
+                                              .Take(pagesize)
+                                              .ToList();
+        ViewBag.pagingmodel = pagingmodel;
+        ViewBag.totalProduc = totalProduc;
         ViewBag.category = category;
-        return View(await products.ToListAsync());
+        return View(productinPage);
     }
 
 
