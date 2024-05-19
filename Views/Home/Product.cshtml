@@ -51,35 +51,6 @@
     </ol>
 </nav>
 
-<div class="mainshop" id="wrapper_mainshop">
-    <div class="headline headline_mainshop" style="padding-top: 0; padding-left: 5%;">Shop</div>
-    <div class="content_shop">
-        <ul class="products">
-            @foreach (var product in Model)
-            {
-                <li class="product-item">
-                    <div class="product-top">
-                        <a asp-action="Product_information" asp-controller="Home"
-                            asp-route-categoryslug="@ViewBag.categoryslug" asp-route-brandslug="@ViewBag.brandslug"
-                            asp-route-productslug="@product.Slug" class="product-thumb">
-                            <img src="@Url.Content("~/images/products/" + product.Slug + "/" + product.MainImage)"
-                                alt="@product.Name">
-                        </a>
-                    </div>
-                    <div class="product-info">
-                        <a asp-action="Product_information" asp-controller="Home"
-                            asp-route-categoryslug="@ViewBag.categoryslug" asp-route-brandslug="@ViewBag.brandslug"
-                            asp-route-productslug="@product.Slug" class="product-name">
-                            @product.Name
-                        </a>
-                        <div class="product-price">@product.Price.ToString("N0") VND</div>
-                    </div>
-                </li>
-            }
-        </ul>
-    </div>
-</div>
-
 <body style="padding-bottom: 50px;">
     <div class="mainshop" id="wrapper_mainshop">
         <div class="headline headline_mainshop" style="padding-top: 0; padding-left: 5%;">Shop</div>

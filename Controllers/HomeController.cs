@@ -184,7 +184,7 @@ public class HomeController : Controller
         return View(productinPage);
     }
 
-    [Route("/product/{categoryslug?}/{brandslug?}/{productslug?}")]
+    [Route("/product/{slug?}/{productslug}.cshtml")]
     public IActionResult Product_information(string categoryslug, string brandslug, string productslug)
     {
         var categories = GetCategories();
