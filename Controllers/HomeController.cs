@@ -114,7 +114,7 @@ public class HomeController : Controller
         return View();
     }
 
-    [Route("/product/{slug?}")]
+    [Route("/product/{categoryslug?}")]
     public async Task<IActionResult> Product(string categoryslug, string brandslug, [FromQuery(Name = "p")] int currentPage, int pagesize)
     {
         var categories = GetCategories();
@@ -165,27 +165,31 @@ public class HomeController : Controller
             currentPage = countPages;
         if (currentPage < 1)
             currentPage = 1;
+
         var pagingmodel = new PagingModel()
         {
             countpages = countPages,
             currentpage = currentPage,
             generateUrl = (pageNumber) => Url.Action("Product", new
             {
+                categoryslug = categoryslug,
+                brandslug = brandslug,
                 p = pageNumber,
                 pagesize = pagesize
             })
         };
+
         var productinPage = products.Skip((currentPage - 1) * pagesize)
-                                              .Take(pagesize)
-                                              .ToList();
+                                    .Take(pagesize)
+                                    .ToList();
         ViewBag.pagingmodel = pagingmodel;
         ViewBag.totalProduc = totalProduc;
         ViewBag.category = category;
         return View(productinPage);
     }
 
-    [Route("/product/{slug?}/{productslug}.cshtml")]
-    public IActionResult Product_information(string categoryslug, string brandslug, string productslug)
+    [Route("/product/{categoryslug}/{productslug}.cshtml")]
+    public IActionResult DetailProduct(string categoryslug, string brandslug, string productslug)
     {
         var categories = GetCategories();
         var brands = GetBrands();
@@ -195,24 +199,22 @@ public class HomeController : Controller
         ViewBag.brands = brands;
         ViewBag.brandslug = brandslug;
 
-        if (string.IsNullOrEmpty(productslug))
-        {
-            return NotFound("Product not found");
-        }
-
-        var product = _context.Products
-                              .Include(p => p.Brand)
-                              .Include(p => p.ProductCategories)
-                              .Include(p => p.Variants) // Include the variants
-                              .FirstOrDefault(p => p.Slug == productslug);
+        var product = _context.Products.Where(p => p.Slug == productslug)
+                                       .Include(p => p.Brand)
+                                       .Include(p => p.Variants)
+                                       .Include(p => p.ProductCategories)
+                                           .ThenInclude(pc => pc.Category)
+                                       .FirstOrDefault();
 
         if (product == null)
         {
-            return NotFound("Product not found");
+            return NotFound("Không tìm thấy sản phẩm");
         }
 
+        ViewBag.product = product;
         return View(product);
     }
+
 
 
     public IActionResult Privacy(string categoryslug, string brandslug)

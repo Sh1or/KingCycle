@@ -22,7 +22,9 @@
 
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="~/">Home</a></li>
+        <li class="breadcrumb-item"><a href="~/">Home </a></li>
+        <li class="breadcrumb-item"><a asp-action="Product">Product </a></li>
+
         @if (category != null)
         {
             var li = category.ListParentsAndSelf();
@@ -64,7 +66,7 @@
 
                     <li class="product-item">
                         <div class="product-top">
-                            <a asp-action="Product_information" asp-controller="Home"
+                            <a asp-action="DetailProduct" asp-controller="Home"
                                 asp-route-categoryslug="@categoryOrBrandSlug" asp-route-productslug="@product.Slug"
                                 class="product-thumb">
                                 <img src="@Url.Content("~/images/products/" + product.Slug + "/" + product.MainImage)"
@@ -72,7 +74,7 @@
                             </a>
                         </div>
                         <div class="product-info">
-                            <a asp-action="Product_information" asp-controller="Home"
+                            <a asp-action="DetailProduct" asp-controller="Home"
                                 asp-route-categoryslug="@categoryOrBrandSlug" asp-route-productslug="@product.Slug"
                                 class="product-name">@product.Name</a>
                             <div class="product-price">

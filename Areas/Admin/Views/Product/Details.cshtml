@@ -188,22 +188,4 @@
         <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
         <a asp-action="Index">Back to List</a>
     </div>
-
-
-
-    @section Scripts {
-        <script src="https://cdn.tiny.cloud/1/d51bskdfs25amewl89wyimb34fzqqpq1xuyy6qcaosi9fwin/tinymce/6/tinymce.min.js"
-            referrerpolicy="origin"></script>
-        <script>
-            // Initialize TinyMCE for any textareas that you want to use in the page (if any).
-            tinymce.init({
-                selector: 'textarea',
-                plugins: 'image link media table',
-                toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | outdent indent | link image | table',
-                height: 300,
-                menubar: false,
-                branding: false
-            });
-        </script>
-    }
 </body>
