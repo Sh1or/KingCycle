@@ -111,8 +111,17 @@ public class HomeController : Controller
                 return NotFound("Không tìm thấy");
             }
         }
+
+        var product = _context.Products
+                                .Include(p => p.Brand)
+                                .Include(p => p.Variants)
+                                .Include(p => p.ProductCategories)
+                                .ThenInclude(p => p.Category)
+                                .AsQueryable();
+        product.OrderByDescending(p => p.DateCreated);
+
         ViewBag.category = category;
-        return View();
+        return View(product.ToList());
     }
 
     public IActionResult Privacy(string categoryslug)

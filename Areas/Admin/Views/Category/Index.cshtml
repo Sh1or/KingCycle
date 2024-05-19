@@ -17,14 +17,16 @@
     <table class="table">
         <thead>
             <tr>
-                <th>
+                <th style="width: 25%;">
                     @Html.DisplayNameFor(model => model.Title)
                 </th>
-                <th>
+                <th style="width: 60%;">
                     @Html.DisplayNameFor(model => model.Content)
                 </th>
 
-                <th></th>
+                <th style="width: 15%;">
+                    Sửa/Xóa
+                </th>
             </tr>
         </thead>
         <tbody>
@@ -33,9 +35,7 @@
                 @await Component.InvokeAsync("RowTreeCategory", new { categories = Model, level = 0 })
 
 
-
-
-
         </tbody>
     </table>
+    <hr>
 </body>
