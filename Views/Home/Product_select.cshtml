@@ -6,16 +6,17 @@
 @{
 
     List<Category> categories = ViewBag.categories as List<Category>;
+    List<Brand> brands = ViewBag.brands as List<Brand>;
 }
 @section Popup {
-
     @await Component.InvokeAsync("App.Components.CategorySideBar",
         new CategorySideBar.CategorySideBarData()
 {
-    Categories = categories,
     level = 0,
-    slugCategory = ViewBag.categorySlug
-
+    Categories = ViewBag.categories,
+    slugCategory = ViewBag.categoryslug,
+    brands = ViewBag.brands,
+    slugBrand = ViewBag.brandslug
 })
 }
 

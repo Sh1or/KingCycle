@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "KINGCYCLE";
     List<Category> categories = ViewBag.categories as List<Category>;
+    List<Brand> brands = ViewBag.brands as List<Brand>;
 }
 
 @section Popup {
@@ -12,7 +13,9 @@
 {
     level = 0,
     Categories = ViewBag.categories,
-    slugCategory = ViewBag.categoryslug
+    slugCategory = ViewBag.categoryslug,
+    brands = ViewBag.brands,
+    slugBrand = ViewBag.brandslug
 })
     }
 }

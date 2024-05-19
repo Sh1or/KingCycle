@@ -11,6 +11,8 @@ namespace App.Components
             public List<Category> Categories { set; get; }
             public int level { set; get; }
             public string slugCategory { set; get; }
+            public List<Brand> brands { set; get; }
+            public string slugBrand { set; get; }
         }
 
         public const string COMPONENTNAME = "CategorySideBar";

@@ -6,13 +6,12 @@
 
 @if (Model.Categories.Count > 0)
 {
-
-    <div class="category-container d-flex justify-content-start ">
+    <div class="category-container d-flex justify-content-start">
         @foreach (var item in Model.Categories)
         {
             @if (item.ParentCategory == null)
             {
-                <div class="collum">
+                <div class="column">
                     <h6>@item.Title</h6>
                     <hr />
                     @if (item.CategoryChildren?.Count > 0)
@@ -26,16 +25,33 @@
                                     </a>
                                 </li>
                                 <hr />
-
                             }
                         </ul>
                     }
                 </div>
             }
         }
+        @if (Model.brands.Count > 0)
+        {
+            <ul class="column">
+                <h6>Thương hiệu</h6>
+                <hr />
+                @foreach (var brand in Model.brands)
+                {
+                    <li>
+                        <a asp-controller="Home" asp-action="Product" asp-route-brandslug="@brand.Slug">
+                            <img src="@brand.Image" alt="@brand.Name" style="max-width: 100px;" />
+                        </a>
+                    </li>
+                    <hr />
+                }
+            </ul>
+        }
     </div>
-
 }
+
+
+
 
 <style>
     .category-container {
@@ -56,15 +72,14 @@
 
     .categorypopup {
         position: fixed;
-        top: 38%;
+        top: 103px;
         left: 50%;
-        transform: translate(-50%, -50%);
+        transform: translateX(-50%);
         z-index: 1000;
         display: none;
         background-color: white;
         padding: 10px;
     }
-
 
     .category-product {
         position: relative;
