@@ -18,7 +18,6 @@
 </style>
 
 <body>
-
     <div class="row">
         <div class="col-md-6">
             <h4>Sản Phẩm</h4>
@@ -65,7 +64,6 @@
                 </dt>
                 <dd class="col-sm-8">
                     @Html.DisplayFor(model => model.Brand.Name)
-
                 </dd>
                 <dt class="col-sm-4">
                     Ảnh Chính
@@ -190,6 +188,8 @@
         <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
         <a asp-action="Index">Back to List</a>
     </div>
+
+
 
     @section Scripts {
         <script src="https://cdn.tiny.cloud/1/d51bskdfs25amewl89wyimb34fzqqpq1xuyy6qcaosi9fwin/tinymce/6/tinymce.min.js"

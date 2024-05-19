@@ -220,8 +220,8 @@ public class HomeController : Controller
         ViewBag.brandslug = brandslug;
         return View();
     }
-
-    public IActionResult Product_information(string categoryslug, string brandslug)
+    [Route("/product/{categoryslug?}/{brandslug?}/{productslug?}")]
+    public IActionResult Product_information(string categoryslug, string brandslug, string productslug)
     {
         var categories = GetCategories();
         var brands = GetBrands();
@@ -230,7 +230,24 @@ public class HomeController : Controller
         ViewBag.categoryslug = categoryslug;
         ViewBag.brands = brands;
         ViewBag.brandslug = brandslug;
-        return View();
+
+        if (string.IsNullOrEmpty(productslug))
+        {
+            return NotFound("Product not found");
+        }
+
+        var product = _context.Products
+                              .Include(p => p.Brand)
+                              .Include(p => p.ProductCategories)
+                              .Include(p => p.Variants) // Include the variants
+                              .FirstOrDefault(p => p.Slug == productslug);
+
+        if (product == null)
+        {
+            return NotFound("Product not found");
+        }
+
+        return View(product);
     }
 
     public IActionResult Product_select(string categoryslug, string brandslug)

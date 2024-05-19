@@ -36,6 +36,8 @@ namespace XEDAPVIP.Areas.Admin.Controllers
         public async Task<IActionResult> Index([FromQuery(Name = "p")] int currentPage, int pagesize)
         {
             var products = _context.Products.OrderByDescending(p => p.DateCreated);
+            var productCount = products.Count();
+            ViewBag.countproduct = productCount;
             int totalProduc = await products.CountAsync();
             if (pagesize <= 0) pagesize = 9;
             int countPages = (int)Math.Ceiling((double)totalProduc / pagesize);
