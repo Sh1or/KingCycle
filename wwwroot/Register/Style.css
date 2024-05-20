@@ -1,33 +1,64 @@
-body{
-    font-family: Arial;
-    background-color: #52f5f5;
-    padding: auto;
-  }
-.register-screen{
+.login {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.logo-container {
+  margin-bottom: 20px;
+  /* Adjust as needed */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+body {
+  font-family: Arial;
+  background-color: #52f5f5;
+  padding: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.col-md-4 {
   background-color: #fff;
   padding: 20px;
   border-radius: 10px;
 }
-.register{
-    margin: 20px auto;
-    width: 350px;
+
+.app-title {
+  text-align: center;
+  color: #777;
 }
-.logo-container{
+
+.login-form {
   text-align: center;
 }
-.col-md-4{
-  margin: auto;
-  width: auto;
-}
-.col-md-6{
+
+.control-group {
   margin-bottom: 10px;
-  padding-bottom: 10px;
 }
-.col-md-6{
+
+input {
+  margin: 10px 0 10px 0;
+  text-align: center;
+  background-color: #ecf0f1;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 200px;
+  padding: 10px 0;
+  width: 300px;
+  transition: border 0.5s;
   display: flex;
-    justify-content: center;
-    align-items: center;
 }
+
+input:focus {
+  border: 2px solid #3498db;
+  box-shadow: none;
+}
+
 .btn {
   padding: 0.8em 1.8em;
   border-radius: 8px;
@@ -42,9 +73,8 @@ body{
   position: relative;
   width: 100%;
   margin-top: 10px;
-  margin-bottom: 10px;
-  padding-bottom: 10px;
 }
+
 .btn::before {
   content: "";
   width: 0;
@@ -58,19 +88,11 @@ body{
   z-index: -1;
   background-color: #17c3b2;
 }
+
 .btn:hover::before {
   width: 105%;
 }
+
 .btn:hover {
   color: #111;
 }
-.btn_icon {
-  justify-content: space-between;
-  display: 100px;
-  margin-bottom: auto;
-}
-
-
-
-
-
