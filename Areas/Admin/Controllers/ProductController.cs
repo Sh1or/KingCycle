@@ -35,7 +35,7 @@ namespace XEDAPVIP.Areas.Admin.Controllers
         // GET: Product
         public async Task<IActionResult> Index([FromQuery(Name = "p")] int currentPage, int pagesize)
         {
-            var products = _context.Products.OrderByDescending(p => p.DateCreated);
+            var products = _context.Products.OrderByDescending(p => p.DateUpdated);
             var productCount = products.Count();
             ViewBag.countproduct = productCount;
             int totalProduc = await products.CountAsync();

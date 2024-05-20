@@ -1,5 +1,6 @@
 @model App.Models.Product
 @using App.Components
+@using Newtonsoft.Json
 
 @{
     ViewData["Title"] = Model?.Name;
@@ -17,22 +18,24 @@
     {
         images.AddRange(Model.SubImages);
     }
+    var colors = Model.Variants.Select(v => v.Color).Distinct().ToList();
+    var sizes = Model.Variants.Select(v => v.Size).Distinct().ToList();
 }
 
 @section Popup {
     @await Component.InvokeAsync(CategorySideBar.COMPONENTNAME,
         new CategorySideBar.CategorySideBarData
-{
-    level = 0,
-    Categories = categories,
-    slugCategory = categoryslug,
-    brands = brands,
-    slugBrand = brandslug
-})
+    {
+        level = 0,
+        Categories = categories,
+        slugCategory = categoryslug,
+        brands = brands,
+        slugBrand = brandslug
+    })
 }
 
 <body>
-    <div class="content_main_bicycle">
+     <div class="content_main_bicycle">
         <div class="grid">
             <div class="is-large">
                 <nav class="woocommerce-breadcrumb breadcrumbs">
@@ -88,33 +91,45 @@
                         </div>
                     </div>
                 </div>
+    <div class="address_bicycle">
+        <h1>@Model.Name</h1>
+        @if (Model.DiscountPrice.HasValue)
+        {
+            <span style="text-decoration: line-through;">@Model.Price.ToString("N0") VND</span>
+            <br />
+            <span>@Model.DiscountPrice.Value.ToString("N0") VND</span>
+        }
+        else
+        {
+            <span>@Model.Price.ToString("N0") VND</span>
+        }
 
-                <div class="address_bicycle">
-                    <h1>@Model.Name</h1>
-                    <div class="price">@Model.Price.ToString("N0") <span>VND</span></div>
-                    @if (Model.DiscountPrice.HasValue)
+        <div class="variations row">
+            <div class="row colors">
+                <div>
+                    @foreach (var color in colors)
                     {
-                        <div class="discounted-price">Discounted Price: @Model.DiscountPrice.Value.ToString("N0")
-                            <span>VND</span>
-                        </div>
+                        <button class="color-button btn me-2 mt-3 btn-outline-light text-muted"
+                            data-color="@color" onclick="selectColor('@color')">@color</button>
                     }
+                </div>
+            </div>
 
-                    <div class="variations">
-                        @foreach (var variant in Model.Variants)
-                        {
-                            <div class="variant">
-                                <label for="">Màu sắc: @variant.Color</label>
-                                <label for="">Kích thước: @variant.Size</label>
-                                <label for="">Số lượng: @variant.Quantity</label>
-                            </div>
-                        }
-                    </div>
-
-                    <div class="address_product">
-                        <div class="product_meta">
-                            <span class="msp_wrapper">Mã Sản Phẩm : <span class="msp">@Model.Id ?? "N/A"</span></span>
-                        </div>
-                        <div class="product_meta_address">
+            <div>
+                <div class="row-sm d-flex">
+                    @foreach (var size in sizes)
+                    {
+                        <button class="size-button btn me-2 mt-3 btn-outline-light text-muted"
+                            data-size="@size" onclick="selectSize('@size')">@size</button>
+                    }
+                </div>
+        </div>
+        </div>
+        <div class="address_product">
+            <div class="product_meta">
+                <span class="msp_wrapper">Mã Sản Phẩm : <span class="msp" id="productCode">xin chọn sản phẩm</span></span>
+            </div>
+     <div class="product_meta_address">
                             <span class="msp_wrapper">Thương hiệu: <a
                                     href="@Url.Action("Product", "Home", new { brandslug = Model.Brand.Slug })"
                                     class="link_TH">@Model.Brand.Name</a></span>
@@ -128,26 +143,23 @@
                                 }
                             </span>
                         </div>
-                        <div class="product_meta_address">
-                            <span style="color: rgb(8, 110, 44); font-weight: 600;" class="msp_wrapper">Còn hàng</span>
-                        </div>
+                   <div class="stock_status" id="stockStatus">Chọn màu và kích thước để kiểm tra tình trạng hàng</div>
 
-                        <div class="quantity">
-                            <input type="button" value="-" class="minus button is-form">
-                            <label class="screen-reader-text" for="quantity_6635973865498">@Model.Name quantity</label>
-                            <input type="number" id="quantity_6635973865498" class="input-text qty text hidden" step="1"
-                                min="1" max="58" name="quantity" value="1" title="Qty" size="4" inputmode="numeric">
-                            <input type="button" value="+" class="plus button is-form">
-                            <button type="submit" class="single_add_to_cart_button button alt">THÊM VÀO GIỎ
-                                HÀNG</button>
-                        </div>
-
-                        <div class="product_sale_bicycle">
+                        <div class="quantity" id="quantityContainer" style="display:none;">
+                <input type="button" value="-" class="minus button is-form" onclick="updateQuantity(-1)">
+                <label class="screen-reader-text" for="quantity_6635973865498">@Model.Name quantity</label>
+                <input type="number" id="quantity_6635973865498" class="input-text qty text" step="1"
+                    min="1" name="quantity" value="1" title="Qty" size="4" inputmode="numeric">
+                <input type="button" value="+" class="plus button is-form" onclick="updateQuantity(1)">
+                <button type="submit" class="single_add_to_cart_button button alt">THÊM VÀO GIỎ HÀNG</button>
+            </div>
+                        <div class="product_sale_bicycle mt-5">
                             <div class="address_sale_product">
                                 <div class="title"><span>KHUYẾN MÃI XE ĐẠP ONLINE</span></div>
                                 <div class="content">
                                     <ul>
-                                        <li>Miễn phí ship giao hàng khi mua xe đạp, không áp dụng với các sản phẩm đang
+                                        <li>Miễn phí ship giao hàng khi mua xe đạp, không áp dụng với các sản phẩm
+                                            đang
                                             có khuyến mãi từ 50%</li>
                                         <li>Giảm 10% đối với đơn hàng phụ kiện từ 3 món</li>
                                         <li>Giảm 15% đối với đơn hàng phụ kiện từ 5 món</li>
@@ -221,3 +233,81 @@
 </body>
 
 <script src="~/js/slider_bicycle.js"></script>
+
+<script type="text/javascript">
+    let selectedColor = '';
+    let selectedSize = '';
+    let variants = @Html.Raw(JsonConvert.SerializeObject(Model.Variants));
+
+    function updateMainImage(imageUrl) {
+        document.getElementById('mainImage').src = imageUrl;
+    }
+
+    function selectColor(color) {
+        selectedColor = color;
+        document.querySelectorAll('.color-button').forEach(btn => {
+            btn.classList.toggle('selected', btn.dataset.color === color);
+        });
+        validateSelections();
+    }
+
+    function selectSize(size) {
+        selectedSize = size;
+        document.querySelectorAll('.size-button').forEach(btn => {
+            btn.classList.toggle('selected', btn.dataset.size === size);
+        });
+        validateSelections();
+    }
+
+    function validateSelections() {
+        let validVariant = variants.find(variant => variant.Color === selectedColor && variant.Size === selectedSize);
+        if (validVariant) {
+            document.getElementById('productCode').innerText = `${@Model.Id}-${validVariant.Id}`;
+            let stockStatus = document.getElementById('stockStatus');
+            let quantityContainer = document.getElementById('quantityContainer');
+            let quantityInput = document.getElementById('quantity_6635973865498');
+            let minusButton = document.querySelector('.minus');
+            let plusButton = document.querySelector('.plus');
+            
+            if (validVariant.Quantity > 0) {
+                stockStatus.innerText = 'Còn hàng';
+                quantityContainer.style.display = 'block';
+                quantityInput.max = validVariant.Quantity;
+                quantityInput.value = '1';
+                quantityInput.disabled = false;
+                minusButton.disabled = false;
+                plusButton.disabled = false;
+            } else {
+                stockStatus.innerText = 'Hết hàng';
+                quantityContainer.style.display = 'block';
+                quantityInput.value = '0';
+                quantityInput.disabled = true;
+                minusButton.disabled = true;
+                plusButton.disabled = true;
+            }
+        } else {
+            document.getElementById('productCode').innerText = 'Không có sản phẩm';
+            document.getElementById('stockStatus').innerText = 'Không có sản phẩm';
+            document.getElementById('quantityContainer').style.display = 'none';
+        }
+    }
+
+    function updateQuantity(change) {
+        let quantityInput = document.getElementById('quantity_6635973865498');
+        let newValue = parseInt(quantityInput.value) + change;
+        if (newValue >= parseInt(quantityInput.min) && newValue <= parseInt(quantityInput.max)) {
+            quantityInput.value = newValue;
+        }
+    }
+</script>
+
+<style>
+    .selected {
+        border: 2px solid blue;
+    }
+
+    .quantity .minus:disabled,
+    .quantity .plus:disabled {
+        cursor: not-allowed;
+    }
+</style

@@ -5,7 +5,9 @@
     List<Category> categories = ViewBag.categories as List<Category>;
     List<Brand> brands = ViewBag.brands as List<Brand>;
     Category category = ViewBag.category as Category;
-    ViewData["Title"] = (category != null) ? category.Title : "Tất Cả Sản Phẩm";
+
+    ViewData[("Title")] = "Sản phẩm";
+
 }
 
 @section Popup {
