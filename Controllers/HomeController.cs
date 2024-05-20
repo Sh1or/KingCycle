@@ -114,8 +114,8 @@ public class HomeController : Controller
         return View();
     }
 
-    [Route("/product/{slug?}")]
-    public async Task<IActionResult> Product(string categoryslug, string brandslug)
+    [Route("/product/{categoryslug?}")]
+    public async Task<IActionResult> Product(string categoryslug, string brandslug, [FromQuery(Name = "p")] int currentPage, int pagesize)
     {
         var categories = GetCategories();
         var brands = GetBrands();
@@ -158,9 +158,63 @@ public class HomeController : Controller
 
         products = products.OrderByDescending(p => p.DateCreated);
 
+        int totalProduc = products.Count();
+        if (pagesize <= 0) pagesize = 9;
+        int countPages = (int)Math.Ceiling((double)totalProduc / pagesize);
+        if (currentPage > countPages)
+            currentPage = countPages;
+        if (currentPage < 1)
+            currentPage = 1;
+
+        var pagingmodel = new PagingModel()
+        {
+            countpages = countPages,
+            currentpage = currentPage,
+            generateUrl = (pageNumber) => Url.Action("Product", new
+            {
+                categoryslug = categoryslug,
+                brandslug = brandslug,
+                p = pageNumber,
+                pagesize = pagesize
+            })
+        };
+
+        var productinPage = products.Skip((currentPage - 1) * pagesize)
+                                    .Take(pagesize)
+                                    .ToList();
+        ViewBag.pagingmodel = pagingmodel;
+        ViewBag.totalProduc = totalProduc;
         ViewBag.category = category;
-        return View(await products.ToListAsync());
+        return View(productinPage);
     }
+
+    [Route("/product/{categoryslug}/{productslug}.cshtml")]
+    public IActionResult DetailProduct(string categoryslug, string brandslug, string productslug)
+    {
+        var categories = GetCategories();
+        var brands = GetBrands();
+
+        ViewBag.categories = categories;
+        ViewBag.categoryslug = categoryslug;
+        ViewBag.brands = brands;
+        ViewBag.brandslug = brandslug;
+
+        var product = _context.Products.Where(p => p.Slug == productslug)
+                                       .Include(p => p.Brand)
+                                       .Include(p => p.Variants)
+                                       .Include(p => p.ProductCategories)
+                                           .ThenInclude(pc => pc.Category)
+                                       .FirstOrDefault();
+
+        if (product == null)
+        {
+            return NotFound("Không tìm thấy sản phẩm");
+        }
+
+        ViewBag.product = product;
+        return View(product);
+    }
+
 
 
     public IActionResult Privacy(string categoryslug, string brandslug)
@@ -210,18 +264,6 @@ public class HomeController : Controller
     }
 
     public IActionResult Check_out(string categoryslug, string brandslug)
-    {
-        var categories = GetCategories();
-        var brands = GetBrands();
-
-        ViewBag.categories = categories;
-        ViewBag.categoryslug = categoryslug;
-        ViewBag.brands = brands;
-        ViewBag.brandslug = brandslug;
-        return View();
-    }
-
-    public IActionResult Product_information(string categoryslug, string brandslug)
     {
         var categories = GetCategories();
         var brands = GetBrands();
