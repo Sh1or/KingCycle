@@ -43,7 +43,7 @@
         </div>
         <hr>
         <div>
-            <a style="text-align: center;" asp-area="" asp-controller="Home" asp-action="Cart">
+            <a style="text-align: center;" asp-area="Home" asp-controller="CartView" asp-action="Cart">
                 <i class="fa-solid fa-cart-shopping"></i>
             </a>
         </div>
@@ -62,7 +62,8 @@
             <nav style="padding: 0;" class="navbar navbar-expand-sm navbar-toggleable-sm justify-content-center">
                 <div class="menu_left row me-5 justify-content-center">
                     <a class="fs-7 text-decoration-none col-sm-auto" asp-area="" asp-controller="Home"
-                        asp-action="Address_shop"><i class="fa-solid fa-location-dot text-primary me-1"></i> TÌM ĐỊA CHỈ CỬA
+                        asp-action="Address_shop"><i class="fa-solid fa-location-dot text-primary me-1"></i> TÌM ĐỊA CHỈ
+                        CỬA
                         HÀNG</a>
                     <a class="fs-7 text-decoration-none col-sm-auto" href="#"><i class="fa-solid fa-phone me-1"></i>
                         HOTLINE: 0352222222</a>
@@ -93,8 +94,8 @@
                     <div style="width: 80%;" class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul style="width: 30%; font-size: 0.9rem;" class="navbar-nav">
                             <li class="nav-item category-product">
-                                <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Product"
-                                    asp-route-slug=" ">SẢN PHẨM</a>
+                                <a class="nav-link text-light" asp-area="Home" asp-controller="ProductView"
+                                    asp-action="Product" asp-route-slug="">SẢN PHẨM</a>
                                 <div class="categorypopup">
                                     @RenderSection("Popup", false)
                                 </div>
@@ -121,7 +122,8 @@
                         </div>
                         <partial name="_LoginPartial" />
                         <partial name="_MenuManagePartial" />
-                        <a asp-area="" asp-controller="Home" asp-action="Cart" class="header-item header__item__cart">
+                        <a asp-area="Home" asp-controller="CartView" asp-action="Cart"
+                            class="header-item header__item__cart">
                             <i class="fa-solid fa-cart-shopping"></i>
                         </a>
                     </div>

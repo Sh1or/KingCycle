@@ -27,8 +27,18 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectString);
 });
 
+builder.Services.AddMemoryCache();
+builder.Services.AddScoped<CacheService>();
+builder.Services.AddScoped<CartService>();
 
 
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 // add mail service
 builder.Services.AddOptions();
@@ -103,12 +113,19 @@ builder.Services.AddAuthentication()
             options.CallbackPath = "/dang-nhap-tu-facebook";
         });
 
+
 builder.Services.Configure<SecurityStampValidatorOptions>(options =>
 {
     // Trên 5 giây truy cập lại sẽ nạp lại thông tin User (Role)
     // SecurityStamp trong bảng User đổi -> nạp lại thông tinn Security
     options.ValidationInterval = TimeSpan.FromSeconds(5);
 });
+
+
+builder.Services.AddAntiforgery(options =>
+   {
+       options.HeaderName = "X-CSRF-TOKEN";
+   });
 
 builder.Services.AddControllers(
     options => options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true);

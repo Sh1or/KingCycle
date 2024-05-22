@@ -21,7 +21,7 @@ namespace XEDAPVIP.Models
 
         [ForeignKey("ProductId")]
         public Product Product { get; set; }
-        public int productCode { get; set; } //for variants
+        public string productCode { get; set; } //for variants
 
         public int Quantity { get; set; }
 
