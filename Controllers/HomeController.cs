@@ -286,6 +286,10 @@ public class HomeController : Controller
         ViewBag.brandslug = brandslug;
         return View();
     }
+    
+    public IActionResult Address_shop(){
+        return View();
+    }
 
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
