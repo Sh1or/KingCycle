@@ -4,6 +4,7 @@ using App.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace XEDAPVIP.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240521103610_V1.6")]
+    partial class V16
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -57,7 +60,7 @@ namespace XEDAPVIP.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Addresses", (string)null);
+                    b.ToTable("Addresses");
                 });
 
             modelBuilder.Entity("App.Models.AppUser", b =>
@@ -164,7 +167,7 @@ namespace XEDAPVIP.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Brands", (string)null);
+                    b.ToTable("Brands");
                 });
 
             modelBuilder.Entity("App.Models.Category", b =>
@@ -199,7 +202,7 @@ namespace XEDAPVIP.Migrations
                         .IsUnique()
                         .HasFilter("[Slug] IS NOT NULL");
 
-                    b.ToTable("Category", (string)null);
+                    b.ToTable("Category");
                 });
 
             modelBuilder.Entity("App.Models.Product", b =>
@@ -257,7 +260,7 @@ namespace XEDAPVIP.Migrations
                         .IsUnique()
                         .HasFilter("[Slug] IS NOT NULL");
 
-                    b.ToTable("Product", (string)null);
+                    b.ToTable("Product");
                 });
 
             modelBuilder.Entity("App.Models.ProductCategory", b =>
@@ -272,7 +275,7 @@ namespace XEDAPVIP.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("ProductCategory", (string)null);
+                    b.ToTable("ProductCategory");
                 });
 
             modelBuilder.Entity("App.Models.ProductVariant", b =>
@@ -303,7 +306,7 @@ namespace XEDAPVIP.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductVariants", (string)null);
+                    b.ToTable("ProductVariants");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -454,6 +457,7 @@ namespace XEDAPVIP.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("SessionId")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -462,13 +466,9 @@ namespace XEDAPVIP.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SessionId");
+                    b.HasIndex("UserId");
 
-                    b.HasIndex("UserId")
-                        .IsUnique()
-                        .HasFilter("[UserId] IS NOT NULL");
-
-                    b.ToTable("Carts", (string)null);
+                    b.ToTable("Carts");
                 });
 
             modelBuilder.Entity("XEDAPVIP.Models.CartItem", b =>
@@ -500,7 +500,7 @@ namespace XEDAPVIP.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("CartItems", (string)null);
+                    b.ToTable("CartItems");
                 });
 
             modelBuilder.Entity("App.Models.Address", b =>
@@ -618,9 +618,8 @@ namespace XEDAPVIP.Migrations
             modelBuilder.Entity("XEDAPVIP.Models.Cart", b =>
                 {
                     b.HasOne("App.Models.AppUser", "User")
-                        .WithOne("Cart")
-                        .HasForeignKey("XEDAPVIP.Models.Cart", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .WithMany()
+                        .HasForeignKey("UserId");
 
                     b.Navigation("User");
                 });
@@ -642,12 +641,6 @@ namespace XEDAPVIP.Migrations
                     b.Navigation("Cart");
 
                     b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("App.Models.AppUser", b =>
-                {
-                    b.Navigation("Cart")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("App.Models.Brand", b =>

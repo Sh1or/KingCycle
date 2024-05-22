@@ -22,7 +22,7 @@ namespace App.Models
 
         [Required(ErrorMessage = "Mô tả sản phẩm là bắt buộc")]
         [Display(Name = "Mô tả sản phẩm")]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [Required(ErrorMessage = "Giá sản phẩm là bắt buộc")]
         [Display(Name = "Giá sản phẩm")]
