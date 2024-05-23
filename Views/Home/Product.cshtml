@@ -6,20 +6,19 @@
     List<Brand> brands = ViewBag.brands as List<Brand>;
     Category category = ViewBag.category as Category;
 
-    ViewData[("Title")] = "Sản phẩm";
-
+    ViewData["Title"] = "Sản phẩm";
 }
 
 @section Popup {
     @await Component.InvokeAsync(CategorySideBar.COMPONENTNAME,
         new CategorySideBar.CategorySideBarData
-{
-    level = 0,
-    Categories = categories,
-    slugCategory = ViewBag.categoryslug as string,
-    brands = brands,
-    slugBrand = ViewBag.brandslug as string
-})
+        {
+            level = 0,
+            Categories = categories,
+            slugCategory = ViewBag.categoryslug as string,
+            brands = brands,
+            slugBrand = ViewBag.brandslug as string
+        })
 }
 
 <style>
@@ -36,8 +35,8 @@
             <div class="is-large">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a style="text-decoration: none; color: rgba(102, 102, 102, .7);" href="~/">Home </a></li>
-                        <li class="breadcrumb-item"><a style="text-decoration: none; color: rgba(102, 102, 102, .7);" asp-action="Product">Product </a></li>
+                        <li class="breadcrumb-item"><a style="text-decoration: none; color: rgba(102, 102, 102, .7);" href="~/">Home</a></li>
+                        <li class="breadcrumb-item"><a style="text-decoration: none; color: rgba(102, 102, 102, .7);" asp-action="Product">Product</a></li>
 
                         @if (category != null)
                         {
@@ -67,12 +66,12 @@
                     </ol>
                 </nav>
                 <div class="medium-text-center">
-                    <form action="" class="woocommerce-ordering" method="get">
+                    <form action="@Url.Action("Product", "Home")" class="woocommerce-ordering" method="get" id="orderForm">
                         <select name="orderby" id="orderby" aria-label="Shop order">
-                            <option value="date">Mới nhất</option>
-                            <option value="popularity">Thứ tự theo mức độ phổ biến</option>
-                            <option value="price">Thứ tự theo giá: thấp đến cao</option>
-                            <option value="price">Thứ tự theo giá: cao xuống thấp</option>
+                            <option value="">Sắp Xếp</option>
+                            <option value="date">Sản phẩm mới nhất</option>
+                            <option value="priceT">Thứ tự theo giá: thấp đến cao</option>
+                            <option value="priceG">Thứ tự theo giá: cao xuống thấp</option>
                         </select>
                     </form>
                 </div>
@@ -105,8 +104,7 @@
                                         <div class="product-price">
                                             @if (product.DiscountPrice.HasValue)
                                             {
-                                                <span style="text-decoration: line-through;">@product.Price.ToString("N0")
-                                                    VND</span>
+                                                <span style="text-decoration: line-through;">@product.Price.ToString("N0") VND</span>
                                                 <br />
                                                 <span>@product.DiscountPrice.Value.ToString("N0") VND</span>
                                             }
@@ -127,5 +125,10 @@
             </div>
         </div>
     </div>
+    <script>
+        // Sự kiện JavaScript để gửi form khi thay đổi giá trị của dropdown
+        document.getElementById("orderby").addEventListener("change", function() {
+            document.getElementById("orderForm").submit();
+        });
+    </script>
 </body>
-
