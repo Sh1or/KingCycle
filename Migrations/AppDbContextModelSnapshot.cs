@@ -17,7 +17,7 @@ namespace XEDAPVIP.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.4")
+                .HasAnnotation("ProductVersion", "8.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -57,7 +57,7 @@ namespace XEDAPVIP.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Addresses", (string)null);
+                    b.ToTable("Addresses");
                 });
 
             modelBuilder.Entity("App.Models.AppUser", b =>
@@ -164,7 +164,7 @@ namespace XEDAPVIP.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Brands", (string)null);
+                    b.ToTable("Brands");
                 });
 
             modelBuilder.Entity("App.Models.Category", b =>
@@ -199,7 +199,7 @@ namespace XEDAPVIP.Migrations
                         .IsUnique()
                         .HasFilter("[Slug] IS NOT NULL");
 
-                    b.ToTable("Category", (string)null);
+                    b.ToTable("Category");
                 });
 
             modelBuilder.Entity("App.Models.Product", b =>
@@ -257,7 +257,7 @@ namespace XEDAPVIP.Migrations
                         .IsUnique()
                         .HasFilter("[Slug] IS NOT NULL");
 
-                    b.ToTable("Product", (string)null);
+                    b.ToTable("Product");
                 });
 
             modelBuilder.Entity("App.Models.ProductCategory", b =>
@@ -272,7 +272,7 @@ namespace XEDAPVIP.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("ProductCategory", (string)null);
+                    b.ToTable("ProductCategory");
                 });
 
             modelBuilder.Entity("App.Models.ProductVariant", b =>
@@ -303,7 +303,7 @@ namespace XEDAPVIP.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductVariants", (string)null);
+                    b.ToTable("ProductVariants");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -439,38 +439,6 @@ namespace XEDAPVIP.Migrations
                     b.ToTable("UserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("XEDAPVIP.Models.Cart", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DateUpdated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("SessionId")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SessionId");
-
-                    b.HasIndex("UserId")
-                        .IsUnique()
-                        .HasFilter("[UserId] IS NOT NULL");
-
-                    b.ToTable("Carts", (string)null);
-                });
-
             modelBuilder.Entity("XEDAPVIP.Models.CartItem", b =>
                 {
                     b.Property<int>("Id")
@@ -479,28 +447,20 @@ namespace XEDAPVIP.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CartId")
-                        .HasColumnType("int");
-
-                    b.Property<double>("Price")
-                        .HasColumnType("float");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<int>("productCode")
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("VariantId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CartId");
+                    b.HasIndex("VariantId");
 
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("CartItems", (string)null);
+                    b.ToTable("CartItems");
                 });
 
             modelBuilder.Entity("App.Models.Address", b =>
@@ -615,39 +575,13 @@ namespace XEDAPVIP.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("XEDAPVIP.Models.Cart", b =>
-                {
-                    b.HasOne("App.Models.AppUser", "User")
-                        .WithOne("Cart")
-                        .HasForeignKey("XEDAPVIP.Models.Cart", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("XEDAPVIP.Models.CartItem", b =>
                 {
-                    b.HasOne("XEDAPVIP.Models.Cart", "Cart")
-                        .WithMany("CartItems")
-                        .HasForeignKey("CartId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("App.Models.Product", "Product")
+                    b.HasOne("App.Models.ProductVariant", "Variant")
                         .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("VariantId");
 
-                    b.Navigation("Cart");
-
-                    b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("App.Models.AppUser", b =>
-                {
-                    b.Navigation("Cart")
-                        .IsRequired();
+                    b.Navigation("Variant");
                 });
 
             modelBuilder.Entity("App.Models.Brand", b =>
@@ -667,11 +601,6 @@ namespace XEDAPVIP.Migrations
                     b.Navigation("ProductCategories");
 
                     b.Navigation("Variants");
-                });
-
-            modelBuilder.Entity("XEDAPVIP.Models.Cart", b =>
-                {
-                    b.Navigation("CartItems");
                 });
 #pragma warning restore 612, 618
         }

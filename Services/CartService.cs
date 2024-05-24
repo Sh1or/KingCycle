@@ -1,65 +1,81 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using App.Models;
-using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using XEDAPVIP.Models;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
+using App.Models;
 
 public class CartService
 {
+    public const string CARTKEY = "CART";
     private readonly AppDbContext _context;
+    private readonly IHttpContextAccessor _contextAccessor;
+    private readonly HttpContext _httpContext;
 
-    public CartService(AppDbContext context)
+    public CartService(AppDbContext context, IHttpContextAccessor contextAccessor)
     {
         _context = context;
+        _contextAccessor = contextAccessor;
+        _httpContext = contextAccessor.HttpContext;
+
     }
 
-    public async Task<Cart> GetOrCreateCartAsync(string userId, string sessionId)
+    public List<CartItem> GetCartItems(string userId = null)
     {
-        var cart = await _context.Carts
-            .Include(c => c.CartItems)
-            .ThenInclude(ci => ci.Product)
-            .FirstOrDefaultAsync(c => c.UserId == userId || c.SessionId == sessionId);
-
-        if (cart == null)
+        if (!string.IsNullOrEmpty(userId))
         {
-            cart = new Cart
-            {
-                UserId = userId,
-                SessionId = sessionId,
-                DateCreated = DateTime.UtcNow,
-                DateUpdated = DateTime.UtcNow
-            };
-            _context.Carts.Add(cart);
-            await _context.SaveChangesAsync();
-        }
 
-        return cart;
-    }
-
-    public async Task AddToCartAsync(string userId, string sessionId, int productId, string productCode, int quantity, double price)
-    {
-        var cart = await GetOrCreateCartAsync(userId, sessionId);
-
-        var cartItem = cart.CartItems.FirstOrDefault(ci => ci.ProductId == productId && ci.productCode == productCode);
-        if (cartItem != null)
-        {
-            cartItem.Quantity += quantity;
+            return _context.CartItems
+                .Where(ci => ci.UserId == userId)
+                .Include(ci => ci.Variant)
+                .ToList();
         }
         else
         {
-            cartItem = new CartItem
+            var session = _httpContext.Session;
+            string jsonCart = session.GetString(CARTKEY);
+            if (jsonCart != null)
             {
-                ProductId = productId,
-                productCode = productCode,
-                Quantity = quantity,
-                Price = price,
-                CartId = cart.Id
-            };
-            cart.CartItems.Add(cartItem);
+                return JsonConvert.DeserializeObject<List<CartItem>>(jsonCart);
+            }
+            return new List<CartItem>();
         }
+    }
 
-        cart.DateUpdated = DateTime.UtcNow;
-        await _context.SaveChangesAsync();
+    public void ClearCart(string userId = null)
+    {
+        if (!string.IsNullOrEmpty(userId))
+        {
+            var cartItems = _context.CartItems.Where(ci => ci.UserId == userId).ToList();
+            _context.CartItems.RemoveRange(cartItems);
+            _context.SaveChanges();
+        }
+        else
+        {
+            var session = _httpContext.Session;
+            session.Remove(CARTKEY);
+        }
+    }
+
+    public void SaveCartItems(string userId, List<CartItem> cartItems)
+    {
+        if (!string.IsNullOrEmpty(userId))
+        {
+            var existingCartItems = _context.CartItems.Where(ci => ci.UserId == userId).ToList();
+            _context.CartItems.RemoveRange(existingCartItems);
+            foreach (var item in cartItems)
+            {
+                item.UserId = userId;
+            }
+            _context.CartItems.AddRange(cartItems);
+            _context.SaveChanges();
+        }
+        else
+        {
+            var session = _httpContext.Session;
+            string jsonCart = JsonConvert.SerializeObject(cartItems);
+            session.SetString(CARTKEY, jsonCart);
+        }
     }
 }

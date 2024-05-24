@@ -6,6 +6,8 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using XEDAPVIP.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace App.Areas.Home.Controllers
 {
@@ -14,15 +16,18 @@ namespace App.Areas.Home.Controllers
     {
         private readonly AppDbContext _context;
         private readonly ILogger<ProductViewController> _logger;
+        private readonly UserManager<AppUser> _userManager;
         private readonly CacheService _cacheService;
+        private readonly CartService _cartService;
 
-
-
-        public ProductViewController(AppDbContext context, ILogger<ProductViewController> logger, IMemoryCache cache, CacheService cacheService)
+        public ProductViewController(AppDbContext context, ILogger<ProductViewController> logger, IMemoryCache cache,
+        CacheService cacheService, CartService cartService, UserManager<AppUser> userManager)
         {
             _context = context;
             _logger = logger;
             _cacheService = cacheService;
+            _cartService = cartService;
+            _userManager = userManager;
 
         }
 
@@ -131,20 +136,66 @@ namespace App.Areas.Home.Controllers
             ViewBag.product = product;
             return View(product);
         }
+        [HttpPost]
+        [Route("addcart/{productId:int}")]
+        public async Task<IActionResult> AddToCart(int productId, [FromQuery] int productCode, [FromBody] CartItem cartItem)
+        {
+            var productVariant = _context.productVariants
+                .FirstOrDefault(p => p.Id == productCode && p.ProductId == productId);
+
+            if (productVariant == null)
+            {
+                return NotFound("Product variant not found");
+            }
+
+            var user = await GetCurrentUserAsync();
+            string userId = user?.Id;  // Get the user ID if authenticated
+
+            List<CartItem> cart;
+            if (!string.IsNullOrEmpty(userId))
+            {
+                cart = _cartService.GetCartItems(userId);
+            }
+            else
+            {
+                cart = _cartService.GetCartItems();
+            }
+
+            var existingCartItem = cart.FirstOrDefault(ci => ci.Variant.Id == productCode);
+
+            if (existingCartItem != null)
+            {
+                existingCartItem.Quantity += cartItem.Quantity;
+            }
+            else
+            {
+                cartItem.Variant = productVariant;
+                cartItem.UserId = userId; // Assign userId (may be null for guests)
+                cart.Add(cartItem);
+            }
+
+            _cartService.SaveCartItems(userId, cart);
+
+            return Ok(new { message = "Item added to cart successfully." });
+        }
 
 
 
 
 
+        // Hiện thị giỏ hàng
+        [Route("/cart", Name = "cart")]
+        public IActionResult Cart()
+        {
+            return View(_cartService.GetCartItems());
+        }
 
 
 
-
-
-
-
-
-
+        private Task<AppUser> GetCurrentUserAsync()
+        {
+            return _userManager.GetUserAsync(HttpContext.User);
+        }
 
     }
 }

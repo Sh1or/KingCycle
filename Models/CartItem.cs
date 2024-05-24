@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
 using App.Models;
 
 namespace XEDAPVIP.Models
@@ -13,19 +9,9 @@ namespace XEDAPVIP.Models
     {
         public int Id { get; set; }
 
-        public int CartId { get; set; }
-
-        [ForeignKey("CartId")]
-        public Cart Cart { get; set; }
-        public int ProductId { get; set; }
-
-        [ForeignKey("ProductId")]
-        public Product Product { get; set; }
-        public string productCode { get; set; } //for variants
-
+        public string? UserId { get; set; }  // Optional
+        public ProductVariant? Variant { get; set; }
+        [Required]
         public int Quantity { get; set; }
-
-        [DataType(DataType.Currency)]
-        public double Price { get; set; }
     }
 }
