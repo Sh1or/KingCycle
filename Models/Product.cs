@@ -53,9 +53,9 @@ namespace App.Models
             get => JsonConvert.DeserializeObject<Dictionary<string, string>>(DetailsJson ?? "{}");
             set => DetailsJson = JsonConvert.SerializeObject(value);
         }
-
+        [JsonIgnore]
         public List<ProductCategory> ProductCategories { get; set; }
-
+        [JsonIgnore]
         public List<ProductVariant> Variants { get; set; }
 
         [Display(Name = "Ảnh sản phẩm")]
@@ -63,6 +63,7 @@ namespace App.Models
         public string MainImage { get; set; }
         public IList<string>? SubImages { get; set; }
         public int BrandId { get; set; }
+        [JsonIgnore]
         public Brand Brand { get; set; }
     }
 }
