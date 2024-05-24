@@ -125,5 +125,17 @@
 
         </div>
     </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Sử dụng delegation để gắn sự kiện cho các phần tử động
+            $('.sidebar').on('click', '.sub-btn', function () {
+                // Chuyển đổi hiển thị menu con với hiệu ứng slideToggle
+                $(this).next('.sub-menu').stop(true, true).slideToggle(300);
+                // Thay đổi biểu tượng
+                $(this).find('.dropdown').toggleClass('fa-bicycle fa-person-biking');
+            });
+        });
+    </script>
     <script src="~/js/productsider.js" asp-append-version="true"></script>
 </body>
