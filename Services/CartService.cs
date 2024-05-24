@@ -29,7 +29,6 @@ public class CartService
             return _context.CartItems
                 .Where(ci => ci.UserId == userId)
                 .Include(ci => ci.Variant)
-                .Include(ci => ci.Variant.Product)
                 .ToList();
         }
         else
@@ -38,7 +37,9 @@ public class CartService
             string jsonCart = session.GetString(CARTKEY);
             if (jsonCart != null)
             {
-                return JsonConvert.DeserializeObject<List<CartItem>>(jsonCart);
+                var cartItems = JsonConvert.DeserializeObject<List<CartItem>>(jsonCart);
+
+                return cartItems;
             }
             return new List<CartItem>();
         }
@@ -63,47 +64,20 @@ public class CartService
     {
         if (!string.IsNullOrEmpty(userId))
         {
-            // Lấy danh sách cart items hiện tại của user từ cơ sở dữ liệu
             var existingCartItems = _context.CartItems.Where(ci => ci.UserId == userId).ToList();
-
-            // Duyệt qua từng cart item được cung cấp để kiểm tra và cập nhật hoặc thêm mới
+            _context.CartItems.RemoveRange(existingCartItems);
             foreach (var item in cartItems)
             {
-                var existingItem = existingCartItems.FirstOrDefault(ci => ci.VariantId == item.VariantId);
-
-                if (existingItem != null)
-                {
-                    // Nếu item với VariantId tương ứng tồn tại, cập nhật thông tin 
-                    existingItem.Quantity = item.Quantity;
-                    // Thêm bất kỳ cập nhật thuộc tính nào khác cần thiết từ item lên existingItem
-                }
-                else
-                {
-                    // Nếu không tìm thấy item với VariantId trong cơ sở dữ liệu, thêm nó như một mục mới
-                    item.UserId = userId;
-                    _context.CartItems.Add(item);
-                }
+                item.UserId = userId;
             }
-
-            // Xóa các cart items cũ không còn trong danh sách mới được cung cấp
-            foreach (var existingItem in existingCartItems)
-            {
-                if (!cartItems.Any(ci => ci.VariantId == existingItem.VariantId))
-                {
-                    _context.CartItems.Remove(existingItem);
-                }
-            }
-
-            // Lưu các thay đổi vào cơ sở dữ liệu
+            _context.CartItems.AddRange(cartItems);
             _context.SaveChanges();
         }
         else
         {
-            // Nếu không có userId, lưu cart vào session
             var session = _httpContext.Session;
             string jsonCart = JsonConvert.SerializeObject(cartItems);
             session.SetString(CARTKEY, jsonCart);
         }
     }
 }
-

@@ -141,6 +141,7 @@ namespace App.Areas.Home.Controllers
         public async Task<IActionResult> AddToCart(int productId, [FromQuery] int productCode, [FromBody] CartItem cartItem)
         {
             var productVariant = _context.productVariants
+                .Include(v => v.Product)
                 .FirstOrDefault(p => p.Id == productCode && p.ProductId == productId);
 
             if (productVariant == null)

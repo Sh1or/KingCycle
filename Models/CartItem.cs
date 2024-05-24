@@ -9,7 +9,9 @@ namespace XEDAPVIP.Models
     {
         public int Id { get; set; }
 
-        public string? UserId { get; set; }  // Optional
+        public string? UserId { get; set; }
+
+        public string? SesionId { get; set; } // Optional
         public int VariantId { get; set; }
         [ForeignKey("VariantId")]
         public ProductVariant? Variant { get; set; }
