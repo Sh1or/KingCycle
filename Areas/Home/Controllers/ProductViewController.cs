@@ -180,14 +180,29 @@ namespace App.Areas.Home.Controllers
         }
 
 
-
-
-
         // Hiện thị giỏ hàng
         [Route("/cart", Name = "cart")]
-        public IActionResult Cart()
+        public async Task<IActionResult> Cart()
         {
-            return View(_cartService.GetCartItems());
+            var categories = await _cacheService.GetCategoriesAsync();
+            var brands = await _cacheService.GetBrandsAsync();
+
+            ViewBag.categories = categories;
+            ViewBag.brands = brands;
+            var user = await GetCurrentUserAsync();
+            string userId = user?.Id;  // Get the user ID if authenticated
+
+            List<CartItem> cart;
+
+            if (!string.IsNullOrEmpty(userId))
+            {
+                cart = _cartService.GetCartItems(userId);
+            }
+            else
+            {
+                cart = _cartService.GetCartItems();
+            }
+            return View(cart);
         }
 
 

@@ -46,6 +46,7 @@ namespace App.Models
            .HasKey(pc => new { pc.ProductId, pc.CategoryId });
 
 
+
         }
 
 
