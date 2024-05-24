@@ -115,7 +115,7 @@ public class HomeController : Controller
     }
 
     [Route("/product/{categoryslug?}")]
-    public async Task<IActionResult> Product(string categoryslug, string brandslug, [FromQuery(Name = "p")] int currentPage, int pagesize)
+    public async Task<IActionResult> Product(string searchString, string categoryslug, string brandslug, [FromQuery(Name = "p")] int currentPage, int pagesize, string orderby = null)
     {
         var categories = GetCategories();
         var brands = GetBrands();
@@ -127,6 +127,17 @@ public class HomeController : Controller
 
         Category category = null;
 
+        var products = _context.Products
+                               .Include(p => p.Brand)
+                               .Include(p => p.Variants)
+                               .Include(p => p.ProductCategories)
+                               .ThenInclude(pc => pc.Category)
+                               .AsQueryable();
+
+        if (!string.IsNullOrEmpty(searchString))
+        {
+            products = products.Where(p => p.Name.Contains(searchString));
+        }
         if (!string.IsNullOrEmpty(categoryslug))
         {
             category = _context.Categories.Where(c => c.Slug == categoryslug)
@@ -139,13 +150,6 @@ public class HomeController : Controller
             }
         }
 
-        var products = _context.Products
-                               .Include(p => p.Brand)
-                               .Include(p => p.Variants)
-                               .Include(p => p.ProductCategories)
-                               .ThenInclude(pc => pc.Category)
-                               .AsQueryable();
-
         if (!string.IsNullOrEmpty(brandslug))
         {
             products = products.Where(p => p.Brand.Slug == brandslug);
@@ -156,7 +160,21 @@ public class HomeController : Controller
             products = products.Where(p => p.ProductCategories.Any(pc => pc.CategoryId == category.Id));
         }
 
-        products = products.OrderByDescending(p => p.DateCreated);
+        switch (orderby)
+        {
+            case "date":
+                products = products.OrderByDescending(p => p.DateCreated);
+                break;
+            case "priceT":
+                products = products.OrderBy(p => p.Price);
+                break;
+            case "priceG":
+                products = products.OrderByDescending(p => p.Price);
+                break;
+            default:
+                products = products.OrderByDescending(p => p.DateCreated);
+                break;
+        }
 
         int totalProduc = products.Count();
         if (pagesize <= 0) pagesize = 9;
@@ -187,7 +205,6 @@ public class HomeController : Controller
         ViewBag.category = category;
         return View(productinPage);
     }
-
     [Route("/product/{categoryslug}/{productslug}.cshtml")]
     public IActionResult DetailProduct(string categoryslug, string brandslug, string productslug)
     {
@@ -286,8 +303,9 @@ public class HomeController : Controller
         ViewBag.brandslug = brandslug;
         return View();
     }
-    
-    public IActionResult Address_shop(){
+
+    public IActionResult Address_shop()
+    {
         return View();
     }
 
