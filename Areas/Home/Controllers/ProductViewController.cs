@@ -34,7 +34,7 @@ namespace App.Areas.Home.Controllers
 
 
         [Route("/product/{categoryslug?}")]
-        public async Task<IActionResult> Product(string categoryslug, string brandslug, [FromQuery(Name = "p")] int currentPage, int pagesize)
+        public async Task<IActionResult> Product(string searchString, string categoryslug, string brandslug, [FromQuery(Name = "p")] int currentPage, int pagesize, string orderby = null)
         {
             var categories = await _cacheService.GetCategoriesAsync();
             var brands = await _cacheService.GetBrandsAsync();
@@ -46,25 +46,28 @@ namespace App.Areas.Home.Controllers
 
             Category category = null;
 
+            var products = _context.Products
+                               .Include(p => p.Brand)
+                               .Include(p => p.Variants)
+                               .Include(p => p.ProductCategories)
+                               .ThenInclude(pc => pc.Category)
+                               .AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                products = products.Where(p => p.Name.Contains(searchString));
+            }
             if (!string.IsNullOrEmpty(categoryslug))
             {
-                category = await _context.Categories
-                    .Where(c => c.Slug == categoryslug)
-                    .Include(c => c.CategoryChildren)
-                    .FirstOrDefaultAsync();
+                category = _context.Categories.Where(c => c.Slug == categoryslug)
+                                              .Include(c => c.CategoryChildren)
+                                              .FirstOrDefault();
 
                 if (category == null)
                 {
                     return NotFound("Không tìm thấy");
                 }
             }
-
-            var products = _context.Products
-                .Include(p => p.Brand)
-                .Include(p => p.Variants)
-                .Include(p => p.ProductCategories)
-                    .ThenInclude(pc => pc.Category)
-                .AsQueryable();
 
             if (!string.IsNullOrEmpty(brandslug))
             {
@@ -76,11 +79,25 @@ namespace App.Areas.Home.Controllers
                 products = products.Where(p => p.ProductCategories.Any(pc => pc.CategoryId == category.Id));
             }
 
-            products = products.OrderByDescending(p => p.DateCreated);
+            switch (orderby)
+            {
+                case "date":
+                    products = products.OrderByDescending(p => p.DateCreated);
+                    break;
+                case "priceT":
+                    products = products.OrderBy(p => p.Price);
+                    break;
+                case "priceG":
+                    products = products.OrderByDescending(p => p.Price);
+                    break;
+                default:
+                    products = products.OrderByDescending(p => p.DateCreated);
+                    break;
+            }
 
-            int totalProducts = await products.CountAsync();
+            int totalProduc = products.Count();
             if (pagesize <= 0) pagesize = 9;
-            int countPages = (int)Math.Ceiling((double)totalProducts / pagesize);
+            int countPages = (int)Math.Ceiling((double)totalProduc / pagesize);
             if (currentPage > countPages)
                 currentPage = countPages;
             if (currentPage < 1)
@@ -92,19 +109,18 @@ namespace App.Areas.Home.Controllers
                 currentpage = currentPage,
                 generateUrl = (pageNumber) => Url.Action("Product", new
                 {
-                    categoryslug,
-                    brandslug,
+                    categoryslug = categoryslug,
+                    brandslug = brandslug,
                     p = pageNumber,
-                    pagesize
+                    pagesize = pagesize
                 })
             };
 
-            var productinPage = await products.Skip((currentPage - 1) * pagesize)
+            var productinPage = products.Skip((currentPage - 1) * pagesize)
                                         .Take(pagesize)
-                                        .ToListAsync();
-
+                                        .ToList();
             ViewBag.pagingmodel = pagingmodel;
-            ViewBag.totalProduc = totalProducts;
+            ViewBag.totalProduc = totalProduc;
             ViewBag.category = category;
             return View(productinPage);
         }
