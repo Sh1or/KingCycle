@@ -11,7 +11,6 @@ namespace XEDAPVIP.Models
 
         public string? UserId { get; set; }
 
-        public string? SesionId { get; set; } // Optional
         public int VariantId { get; set; }
         [ForeignKey("VariantId")]
         public ProductVariant? Variant { get; set; }

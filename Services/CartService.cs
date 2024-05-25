@@ -29,6 +29,7 @@ public class CartService
             return _context.CartItems
                 .Where(ci => ci.UserId == userId)
                 .Include(ci => ci.Variant)
+                .ThenInclude(v => v.Product)
                 .ToList();
         }
         else
