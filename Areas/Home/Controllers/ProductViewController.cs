@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using XEDAPVIP.Models;
 using Microsoft.AspNetCore.Identity;
+using Newtonsoft.Json;
 
 namespace App.Areas.Home.Controllers
 {
@@ -156,9 +157,9 @@ namespace App.Areas.Home.Controllers
         [Route("addcart/{productId:int}")]
         public async Task<IActionResult> AddToCart(int productId, [FromQuery] int productCode, [FromBody] CartItem cartItem)
         {
-            var productVariant = _context.productVariants
+            var productVariant = await _context.productVariants
                 .Include(v => v.Product)
-                .FirstOrDefault(p => p.Id == productCode && p.ProductId == productId);
+                .FirstOrDefaultAsync(p => p.Id == productCode && p.ProductId == productId);
 
             if (productVariant == null)
             {
@@ -197,6 +198,7 @@ namespace App.Areas.Home.Controllers
         }
 
 
+
         // Hiện thị giỏ hàng
         [Route("/cart", Name = "cart")]
         public async Task<IActionResult> Cart()
@@ -219,8 +221,49 @@ namespace App.Areas.Home.Controllers
             {
                 cart = _cartService.GetCartItems();
             }
+
+            // Generate the anti-forgery token and pass it to the view
+            var tokens = HttpContext.RequestServices.GetService<Microsoft.AspNetCore.Antiforgery.IAntiforgery>();
+            var tokenSet = tokens.GetAndStoreTokens(HttpContext);
+            ViewBag.AntiForgeryToken = tokenSet.RequestToken;
+
             return View(cart);
         }
+        [Route("/removecart/{itemId?}")]
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteItem(int itemId)
+        {
+            var user = await GetCurrentUserAsync();
+            string userId = user?.Id;  // Get the user ID if authenticated
+
+            if (!string.IsNullOrEmpty(userId))
+            {
+                var item = await _context.CartItems.FindAsync(itemId);
+                if (item != null && item.UserId == userId)
+                {
+                    _context.CartItems.Remove(item);
+                    await _context.SaveChangesAsync();
+                }
+            }
+            else
+            {
+                var session = HttpContext.Session;
+                string jsonCart = session.GetString(CartService.CARTKEY);
+                if (jsonCart != null)
+                {
+                    var cartItems = JsonConvert.DeserializeObject<List<CartItem>>(jsonCart);
+                    var item = cartItems.FirstOrDefault(ci => ci.Id == itemId);
+                    if (item != null)
+                    {
+                        cartItems.Remove(item);
+                        session.SetString(CartService.CARTKEY, JsonConvert.SerializeObject(cartItems));
+                    }
+                }
+            }
+            return Json(new { success = true });
+        }
+
 
 
 

@@ -65,13 +65,35 @@ public class CartService
     {
         if (!string.IsNullOrEmpty(userId))
         {
+            // Get existing cart items for the user
             var existingCartItems = _context.CartItems.Where(ci => ci.UserId == userId).ToList();
-            _context.CartItems.RemoveRange(existingCartItems);
+
+            // Iterate over each cart item to either update the existing one or add a new one
             foreach (var item in cartItems)
             {
-                item.UserId = userId;
+                var existingItem = existingCartItems.FirstOrDefault(ci => ci.VariantId == item.VariantId);
+                if (existingItem != null)
+                {
+                    // Update quantity if item already exists
+                    existingItem.Quantity = item.Quantity;
+                }
+                else
+                {
+                    // Add new item
+                    item.UserId = userId;
+                    _context.CartItems.Add(item);
+                }
             }
-            _context.CartItems.AddRange(cartItems);
+
+            // Remove items that are no longer in the cart
+            foreach (var existingItem in existingCartItems)
+            {
+                if (!cartItems.Any(ci => ci.VariantId == existingItem.VariantId))
+                {
+                    _context.CartItems.Remove(existingItem);
+                }
+            }
+
             _context.SaveChanges();
         }
         else
@@ -81,4 +103,6 @@ public class CartService
             session.SetString(CARTKEY, jsonCart);
         }
     }
+
+
 }
