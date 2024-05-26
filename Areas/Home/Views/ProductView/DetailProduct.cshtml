@@ -33,6 +33,7 @@
     slugBrand = brandslug
 })
 }
+<partial name="_StatusMessage" />
 
 <div class="content_main_bicycle">
     <!-- Content -->
@@ -358,6 +359,7 @@
                 .then(response => {
                     if (response.ok) {
                         console.log('Thêm thành công');
+                        location.reload()
                     } else {
                         console.error('Error adding item to cart:', response.statusText);
                     }
