@@ -33,9 +33,12 @@ namespace XEDAPVIP.Areas.Admin.Controllers
         }
 
         // GET: Product
+        // GET: Product
         public async Task<IActionResult> Index(string searchString, [FromQuery(Name = "p")] int currentPage = 1, int pagesize = 12, string priceRange = null)
         {
             var products = _context.Products.AsQueryable();
+            var productCount = await products.CountAsync();
+            ViewBag.countproduct = productCount;
 
             if (!string.IsNullOrEmpty(searchString))
             {
@@ -55,8 +58,7 @@ namespace XEDAPVIP.Areas.Admin.Controllers
                     break;
             }
 
-            var productCount = await products.CountAsync();
-            ViewBag.countproduct = productCount;
+
             if (pagesize <= 0) pagesize = 12;
             int countPages = (int)Math.Ceiling((double)productCount / pagesize);
             if (currentPage > countPages) currentPage = countPages;
