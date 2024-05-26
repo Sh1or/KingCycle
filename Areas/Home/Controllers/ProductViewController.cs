@@ -193,6 +193,7 @@ namespace App.Areas.Home.Controllers
             }
 
             _cartService.SaveCartItems(userId, cart);
+            TempData["SuccessMessage"] = "Thêm vào giỏ hàng thành công.";
 
             return Ok(new { message = "Item added to cart successfully." });
         }
@@ -261,6 +262,8 @@ namespace App.Areas.Home.Controllers
                     }
                 }
             }
+            TempData["SuccessMessage"] = "Xoá sản phẩm trong giỏ hàng thành công.";
+
             return Json(new { success = true });
         }
 
@@ -273,6 +276,7 @@ namespace App.Areas.Home.Controllers
 
             // Update cart items in the cart service
             _cartService.SaveCartItems(userId, updatedCart);
+            TempData["SuccessMessage"] = "Cập nhập giỏ hàng thành công.";
 
             return Ok(new { success = true });
         }
