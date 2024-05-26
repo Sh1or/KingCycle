@@ -34,7 +34,7 @@ namespace App.Areas.Home.Controllers
 
 
 
-        [Route("/product/{categoryslug?}")]
+        [Route("/product/{slug?}")]
         public async Task<IActionResult> Product(string searchString, string categoryslug, string brandslug, [FromQuery(Name = "p")] int currentPage, int pagesize, string orderby = null)
         {
             var categories = await _cacheService.GetCategoriesAsync();
@@ -289,6 +289,8 @@ namespace App.Areas.Home.Controllers
 
             return Ok(new { success = true });
         }
+
+
 
 
 
