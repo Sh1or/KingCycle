@@ -326,14 +326,9 @@
         }
     }
 
-    function updateQuantity(change) {
-        let quantityInput = document.getElementById('quantity_6635973865498');
-        let newValue = parseInt(quantityInput.value) + change;
-        if (newValue >= parseInt(quantityInput.min) && newValue <= parseInt(quantityInput.max)) {
-            quantityInput.value = newValue;
-        }
-    }
 
+
+    // nút thêm giỏ hàng
     document.getElementById('addtoCart').addEventListener('click', function () {
         let selectedVariant = variants.find(variant => variant.Color === selectedColor && variant.Size === selectedSize);
 
@@ -362,6 +357,8 @@
                         location.reload()
                     } else {
                         console.error('Error adding item to cart:', response.statusText);
+                        location.reload()
+
                     }
                 })
                 .catch(error => console.error('Error adding item to cart:', error));
