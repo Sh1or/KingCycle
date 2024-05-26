@@ -264,6 +264,18 @@ namespace App.Areas.Home.Controllers
             return Json(new { success = true });
         }
 
+        [HttpPost]
+        [Route("/updatecart")]
+        public async Task<IActionResult> UpdateCart([FromBody] List<CartItem> updatedCart)
+        {
+            var user = await GetCurrentUserAsync();
+            string userId = user?.Id;  // Get the user ID if authenticated
+
+            // Update cart items in the cart service
+            _cartService.SaveCartItems(userId, updatedCart);
+
+            return Ok(new { success = true });
+        }
 
 
 
