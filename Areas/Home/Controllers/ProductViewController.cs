@@ -232,6 +232,8 @@ namespace App.Areas.Home.Controllers
                 cart = _cartService.GetCartItems();
             }
 
+            // Fetch and assign product variant details
+
             // Generate the anti-forgery token and pass it to the view
             var tokens = HttpContext.RequestServices.GetService<Microsoft.AspNetCore.Antiforgery.IAntiforgery>();
             var tokenSet = tokens.GetAndStoreTokens(HttpContext);
@@ -239,6 +241,7 @@ namespace App.Areas.Home.Controllers
 
             return View(cart);
         }
+
         [Route("/removecart/{itemId?}")]
 
         [HttpPost]
@@ -275,13 +278,28 @@ namespace App.Areas.Home.Controllers
 
             return Json(new { success = true });
         }
-
         [HttpPost]
         [Route("/updatecart")]
         public async Task<IActionResult> UpdateCart([FromBody] List<CartItem> updatedCart)
         {
             var user = await GetCurrentUserAsync();
-            string userId = user?.Id;  // Get the user ID if authenticated
+            string userId = user?.Id;
+
+            foreach (var v in updatedCart)
+            {
+                var productVariant = await _context.productVariants
+                                                    .Include(pv => pv.Product)
+                                                    .FirstOrDefaultAsync(pv => pv.Id == v.VariantId);
+
+                if (productVariant == null)
+                {
+                    TempData["ErrorMessage"] = $"Product variant with ID {v.VariantId} not found.";
+                    return NotFound(new { success = false, message = $"Product variant with ID {v.VariantId} not found." });
+                }
+
+                // Assign the fetched product variant to the cart item
+                v.Variant = productVariant;
+            }
 
             // Update cart items in the cart service
             _cartService.SaveCartItems(userId, updatedCart);
@@ -289,6 +307,7 @@ namespace App.Areas.Home.Controllers
 
             return Ok(new { success = true });
         }
+
 
 
 

@@ -152,7 +152,7 @@
                                 <tr class="checkcart col-oder">
                                     <th>Tổng</th>
                                     <td>@totalQuantity</td>
-                                    <td>@totalPrice?.ToString("N0") VND</td>
+                                    <td id="total-order">@totalPrice?.ToString("N0") VND</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -224,45 +224,44 @@
         </div>
     </div>
 </body>
+<partial name="_StatusMessage" />
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
-        // Function to load districts based on selected province
-        function loadDistricts(provinceId) {
-            if (provinceId) {
-                $.getJSON('/Member/GetDistrictsByProvinceId', { provinceId: provinceId }, function (districts) {
-                    var districtSelect = $('#SelectedDistrict');
-                    districtSelect.empty();
-                    districtSelect.append($('<option/>', { value: '', text: 'Chọn Quận/Huyện' }));
-                    $.each(districts, function (index, district) {
-                        districtSelect.append($('<option/>', { value: district.id, text: district.name }));
+        $(document).ready(function () {
+            function loadDistricts(provinceId) {
+                if (provinceId) {
+                    $.getJSON('/Member/GetDistrictsByProvinceId', { provinceId: provinceId }, function (districts) {
+                        var districtSelect = $('#SelectedDistrict');
+                        districtSelect.empty();
+                        districtSelect.append($('<option/>', { value: '', text: 'Chọn Quận/Huyện' }));
+                        $.each(districts, function (index, district) {
+                            districtSelect.append($('<option/>', { value: district.id, text: district.name }));
+                        });
                     });
-                });
-            } else {
-                $('#SelectedDistrict').empty().append($('<option/>', { value: '', text: 'Chọn Quận/Huyện' }));
-            }
-            $('#SelectedWard').empty().append($('<option/>', { value: '', text: 'Chọn Phường/Xã' }));
-        }
-
-        // Function to load wards based on selected district
-        function loadWards(districtId) {
-            if (districtId) {
-                $.getJSON('/Member/GetWardsByDistrictId', { districtId: districtId }, function (wards) {
-                    var wardSelect = $('#SelectedWard');
-                    wardSelect.empty();
-                    wardSelect.append($('<option/>', { value: '', text: 'Chọn Phường/Xã' }));
-                    $.each(wards, function (index, ward) {
-                        wardSelect.append($('<option/>', { value: ward.id, text: ward.name }));
-                    });
-                });
-            } else {
+                } else {
+                    $('#SelectedDistrict').empty().append($('<option/>', { value: '', text: 'Chọn Quận/Huyện' }));
+                }
                 $('#SelectedWard').empty().append($('<option/>', { value: '', text: 'Chọn Phường/Xã' }));
             }
-        }
 
-        $(document).ready(function () {
+            function loadWards(districtId) {
+                if (districtId) {
+                    $.getJSON('/Member/GetWardsByDistrictId', { districtId: districtId }, function (wards) {
+                        var wardSelect = $('#SelectedWard');
+                        wardSelect.empty();
+                        wardSelect.append($('<option/>', { value: '', text: 'Chọn Phường/Xã' }));
+                        $.each(wards, function (index, ward) {
+                            wardSelect.append($('<option/>', { value: ward.id, text: ward.name }));
+                        });
+                    });
+                } else {
+                    $('#SelectedWard').empty().append($('<option/>', { value: '', text: 'Chọn Phường/Xã' }));
+                }
+            }
+
             $('#SelectedProvince').change(function () {
                 var provinceId = $(this).val();
                 loadDistricts(provinceId);
@@ -289,60 +288,78 @@
                 }
             });
 
-            // Initial check to set visibility on page load
             if ($('#pickupInStore').is(':checked')) {
                 $('#addressSelection').hide();
             }
 
+            function getSelectedText(elementId) {
+                var element = document.getElementById(elementId);
+                return element.options[element.selectedIndex].text;
+            }
 
+            var isLoggedIn = '@User.Identity.IsAuthenticated'.toLowerCase();
+            $('#placeOrderBtn').click(function () {
+                var selectedProvinceText = getSelectedText('SelectedProvince');
+                var selectedDistrictText = getSelectedText('SelectedDistrict');
+                var selectedWardText = getSelectedText('SelectedWard');
+                var streetNumber = $('#streetNumber').val();
+                var homeAddress = $('#defaultAddress').val();
+                var total = $('#total-order').text().replace(/\D/g, '');
+                var isOtherAddressChecked = $('#toggle-address').is(':checked');
+                var fullName = $('#fullName').val();
+                var phoneNumber = $('#phoneNumber').val();
+                var emailAddress = $('#emailAddress').val();
+                var orderNote = $('#orderNote').val();
+                var shippingMethod = $('input[name="check_GH"]:checked').val();
+                var paymentMethod = $('input[name="checkTT"]:checked').val();
+                var cartItemIdsJson = '@Html.Raw(cartItemIdsJson)';
+                var antiForgeryToken = $('#antiForgeryToken').val();
 
-        });
-    </script>
-    <script>
+                var shippingAddress = isOtherAddressChecked ?
+                    `${streetNumber}, ${selectedWardText}, ${selectedDistrictText}, ${selectedProvinceText}` :
+                    homeAddress || `${streetNumber}, ${selectedWardText}, ${selectedDistrictText}, ${selectedProvinceText}`;
 
-        $(document).ready(function () {
-            $('#placeOrderBtn').click(function (e) {
-                e.preventDefault();
+                var data = {
+                    FullName: fullName,
+                    PhoneNumber: phoneNumber,
+                    EmailAddress: emailAddress,
+                    OrderNote: orderNote,
+                    ShippingAddress: shippingAddress,
+                    ShippingMethod: shippingMethod,
+                    TotalAmount: total,
+                    PaymentMethod: paymentMethod,
+                    Status: "Pending",
+                    CartItemIds: JSON.parse(cartItemIdsJson)
+                };
 
+                // Check if the user is logged in and include UserId if true
+                if (isLoggedIn === "true") {
+                    data.UserId = '@Model.UserId';
+                }
 
-                var orderDetails = {
-                    FullName: $('#fullName').val(),
-                    PhoneNumber: $('#phoneNumber').val(),
-                    EmailAddress: $('#emailAddress').val(),
-                    OrderNote: $('#orderNote').val(),
-                    ShippingMethod: $('input[name="check_GH"]:checked').val(),
-                    PaymentMethod: $('input[name="checkTT"]:checked').val(),
-                    TotalAmount: @totalPrice,
-                    OrderDate: new Date().toISOString(),
-                    Status: 'Pending',
-                    ShippingAddress: $('#toggle-address').is(':checked') ?
-                        `${$('#streetNumber').val()}, ${$('#SelectedWard option:selected').val()}, ${$('#SelectedDistrict option:selected').val()}, ${$('#SelectedProvince option:selected').val()}` :
-                        $('#defaultAddress').val(),
-                    CartItemIds: @Html.Raw(cartItemIdsJson)
-                                                };
-                console.log(orderDetails)
                 $.ajax({
-                    url: '/Home/CheckOut/PlaceOrder',
                     type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(orderDetails),
+                    url: '/PlaceOrder',
                     headers: {
-                        'RequestVerificationToken': $('#antiForgeryToken').val()
+                        'RequestVerificationToken': antiForgeryToken
                     },
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
                     success: function (response) {
-                        if (response.success) {
-                            window.location.href = response.redirectUrl;
-                        } else {
-                            alert('Đã xảy ra lỗi khi đặt hàng. Vui lòng thử lại sau.');
-                        }
+                        // Handle success, e.g., show a success message or redirect to a thank you page
+                        location.reload();
+                        console.log('Order placed successfully:', response);
+                        // Example redirect:
+                        // window.location.href = '/Order/ThankYou';
                     },
                     error: function (error) {
-                        alert('Đã xảy ra lỗi khi đặt hàng. Vui lòng thử lại sau.');
+                        // Handle error, e.g., show an error message
+                        console.error('Error placing order:', error);
+                        // Example error message display:
+                        // $('#errorMessage').text('Error placing order. Please try again later.');
                     }
                 });
             });
         });
     </script>
-
-
 }

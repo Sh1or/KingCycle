@@ -68,6 +68,7 @@ namespace App.Areas.Home.Controllers
 
                 if (!string.IsNullOrEmpty(userId))
                 {
+                    model.UserId = user.Id;
                     model.UserName = user.UserName;
                     model.UserEmail = user.Email;
                     model.PhoneNumber = user.PhoneNumber;
@@ -90,55 +91,74 @@ namespace App.Areas.Home.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         [Route("/PlaceOrder", Name = "PlaceOrder")]
         public async Task<IActionResult> PlaceOrder([FromBody] OrderRequestModel orderRequest)
         {
-            if (ModelState.IsValid)
+            if (orderRequest == null || !orderRequest.CartItemIds.Any())
             {
-                try
-                {
-                    var user = await GetCurrentUserAsync();
-                    var userId = user?.Id;
-
-                    List<CartItem> cartItems = !string.IsNullOrEmpty(userId)
-                        ? _cartService.GetCartItems(userId)
-                        : _cartService.GetCartItems();
-
-                    var order = await _orderService.CreateOrderAsync(
-                        userId,
-                        orderRequest.FullName,
-                        orderRequest.EmailAddress,
-                        cartItems, // Pass the cart items directly
-                        orderRequest.ShippingAddress,
-                        orderRequest.ShippingMethod,
-                        orderRequest.PaymentMethod);
-
-                    return Json(new { success = true, redirectUrl = Url.Action("OrderComplete", new { orderId = order.Id }) });
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error placing order");
-                    return Json(new { success = false, message = "Đã xảy ra lỗi khi đặt hàng. Vui lòng thử lại sau." });
-                }
+                _logger.LogWarning("Invalid order request received.");
+                return BadRequest("Invalid order request.");
             }
 
-            return Json(new { success = false, message = "Thông tin đơn hàng không hợp lệ." });
+            try
+            {
+                _logger.LogInformation("Placing order for user {UserId} with items {CartItemIds}",
+                    orderRequest.UserId ?? "guest", string.Join(", ", orderRequest.CartItemIds));
+
+                // Retrieve cart items
+                List<CartItem> cartItems;
+                if (string.IsNullOrEmpty(orderRequest.UserId))
+                {
+                    // Guest user - retrieve cart items from session
+                    cartItems = _cartService.GetCartItems();
+                }
+                else
+                {
+                    // Logged-in user - retrieve cart items from database
+                    cartItems = _cartService.GetCartItems(orderRequest.UserId);
+                }
+
+                if (cartItems == null || !cartItems.Any())
+                {
+                    _logger.LogWarning("No cart items found for user {UserId}.", orderRequest.UserId ?? "guest");
+                    return BadRequest("No cart items found.");
+                }
+
+                // Ensure cartItemIds are valid
+                var validCartItemIds = cartItems.Select(ci => ci.Id).Intersect(orderRequest.CartItemIds).ToList();
+                if (!validCartItemIds.Any())
+                {
+                    _logger.LogWarning("No valid cart item IDs found for user {UserId}.", orderRequest.UserId ?? "guest");
+                    return BadRequest("No valid cart item IDs found.");
+                }
+
+                var order = await _orderService.CreateOrderAsync(
+                    orderRequest.UserId,
+                    orderRequest.FullName,
+                    orderRequest.PhoneNumber,
+                    orderRequest.EmailAddress,
+                    orderRequest.OrderNote,
+                    validCartItemIds,
+                    orderRequest.ShippingAddress,
+                    orderRequest.ShippingMethod,
+                    orderRequest.PaymentMethod,
+                    orderRequest.TotalAmount,
+                    orderRequest.Status
+                );
+
+                TempData["SuccessMessage"] = "Đặt hàng thành công.";
+
+                return Ok(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while placing the order for user {UserId}", orderRequest.UserId ?? "guest");
+                return StatusCode(500, "An error occurred while placing the order.");
+            }
         }
-
-
-        public async Task<JsonResult> SetShippingAddress(ProfileCheckoutModel checkoutModel)
-        {
-            var provinceName = await GetProvinceNameById(checkoutModel.SelectedProvince);
-            var districtName = await GetDistrictNameById(checkoutModel.SelectedDistrict);
-            var wardName = await GetWardNameById(checkoutModel.SelectedWard);
-            var shippingAddress = $"{checkoutModel.StreetNumber}, {wardName}, {districtName}, {provinceName}";
-
-            return Json(new { ShippingAddress = shippingAddress });
-        }
-
 
         [HttpGet]
+
         public async Task<IActionResult> GetProvinceDistrictWard()
         {
             try
@@ -163,7 +183,6 @@ namespace App.Areas.Home.Controllers
                 return StatusCode(500);
             }
         }
-
         public async Task<List<Province>> GetProvincesAsync()
         {
             var dataDiagioiResponse = await GetProvinceDistrictWard();

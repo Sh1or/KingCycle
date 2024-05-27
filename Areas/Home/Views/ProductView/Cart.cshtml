@@ -57,7 +57,7 @@
                     @foreach (var cartitem in Model){
 
                             var codePrice = cartitem.Variant.Product.Price;
-                            var discPrice = cartitem.Variant.Product?.DiscountPrice;
+                            var discPrice = cartitem.Variant.Product.DiscountPrice;
                             var unitPrice = (discPrice != null) ? discPrice : codePrice;
                             var thanhtien = cartitem.Quantity * unitPrice;
                         total += thanhtien;
@@ -65,9 +65,9 @@
                         <table class="cart_product_buy">
                             <tbody>
                                 <tr class="product_cart_buy" data-item-id="@cartitem.Id"
-                                    data-max-quantity="@cartitem.Variant.Quantity"
-                                    data-unit-price="@unitPrice" data-variant-id="@cartitem.VariantId">
-                                    <td class="product_name">@cartitem.Variant.Product.Name</td>
+                                    data-max-quantity="@cartitem?.Variant.Quantity"
+                                    data-unit-price="@unitPrice" data-variant-id="@cartitem.Variant.Id">
+                                    <td class="product_name">@cartitem?.Variant.Product.Name</td>
                                     <td class="product_img">
                                         <img src="@Url.Content("~/images/products/" + cartitem.Variant.Product.Slug + "/" + cartitem.Variant.Product.MainImage)"
                                             alt="@cartitem.Variant.Product.Name">

@@ -22,6 +22,9 @@ namespace App.Models
         public string UserEmail { get; set; }
 
         [StringLength(100)]
+        public string PhoneNumber { get; set; }
+
+        [StringLength(100)]
         public string? OrderNote { get; set; }
 
         [Required]
@@ -31,7 +34,7 @@ namespace App.Models
 
         [Required]
         [DataType(DataType.Currency)]
-        public double TotalAmount { get; set; }
+        public string TotalAmount { get; set; }
 
         [Required]
         [StringLength(50)]

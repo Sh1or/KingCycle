@@ -10,14 +10,14 @@ namespace App.Models
         public int Id { get; set; }
 
         [Required]
-        public int OrderId { get; set; }
+        public int? OrderId { get; set; }
         [ForeignKey("OrderId")]
-        public Order Order { get; set; }
+        public Order? Order { get; set; }
 
         [Required]
-        public int VariantId { get; set; }
+        public int? VariantId { get; set; }
         [ForeignKey("VariantId")]
-        public ProductVariant Variant { get; set; }
+        public ProductVariant? Variant { get; set; }
 
         [Required]
         [StringLength(100)]
