@@ -8,8 +8,10 @@ namespace XEDAPVIP.Areas.Home.Models.CheckOut
 {
     public class ProfileCheckoutModel
     {
+        public string? UserId { get; set; }
+
         [Display(Name = "Tên tài khoản")]
-        [Required(ErrorMessage = "Tên tài khoản là bắt buộc.")]
+        [Required(ErrorMessage = "Tên đặt hàng là bắt buộc.")]
         public string UserName { get; set; }
 
         [Display(Name = "Địa chỉ email")]

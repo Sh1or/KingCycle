@@ -18,7 +18,6 @@ using Newtonsoft.Json;
 namespace App.Areas.Identity.Controllers
 {
 
-    [Authorize]
     [Area("Identity")]
     [Route("/Member/[action]")]
     public class ManageController : Controller
