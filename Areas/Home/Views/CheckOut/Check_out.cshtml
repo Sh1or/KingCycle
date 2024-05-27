@@ -32,11 +32,12 @@
         <div class="grid">
             <div class="is-large">
                 <nav style="text-align: center; width: 100%;" class="woocommerce-breadcrumb breadcrumbs">
-                    <a asp-action="Cart">SHOPPING CART</a>
+                    <a asp-area="Home" asp-controller="ProductView"
+                                        asp-action="Cart">SHOPPING CART</a>
                     <span style="font-weight: 100;" class="divider">></span>
                     <a style="color: black;" href="#">CHECKOUT DETAILS</a>
                     <span style="font-weight: 100;" class="divider">></span>
-                    <a>ORDER COMPLETE</a>
+                    <a style="color: rgba(102, 102, 102, .7);">ORDER COMPLETE</a>
                 </nav>
             </div>
             <h4 style="margin-top: 20px;">Thông tin nhận hàng</h4>
@@ -62,7 +63,7 @@
                                 <input type="text" id="defaultAddress" value="@Model.HomeAddress" disabled>
                             </div>
                             <div style="text-align: right;">
-                                <label>
+                                <label style="width: 30%; padding-top: 20px;">
                                     <input type="checkbox" id="toggle-address"> Dùng Địa Chỉ Khác
                                 </label>
                             </div>
