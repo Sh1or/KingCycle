@@ -186,14 +186,14 @@ namespace App.Areas.Home.Controllers
                 // Check if adding the new quantity exceeds the maximum allowed quantity
                 if (existingCartItem.Quantity + cartItem.Quantity > productVariant.Quantity)
                 {
-                    TempData["ErrorMessage"] = "Số lượng hiện có trong giỏ hàng đã tối đa.";
+                    TempData["ErrorMessage"] = "Số lượng thêm vào giỏ hàng hiện có đã vượt quá số lượng hiện có.";
                     return BadRequest(new { message = "Cannot add more of this product. Maximum quantity reached." });
                 }
                 existingCartItem.Quantity += cartItem.Quantity;
             }
             else
             {
-                if (cartItem.Quantity > productVariant.Quantity)
+                if (cartItem.Quantity >= productVariant.Quantity)
                 {
                     TempData["ErrorMessage"] = "Số lượng hiện có trong giỏ hàng đã tối đa.";
                     return BadRequest(new { message = "Cannot add more of this product. Maximum quantity reached." });
@@ -232,8 +232,6 @@ namespace App.Areas.Home.Controllers
                 cart = _cartService.GetCartItems();
             }
 
-            // Fetch and assign product variant details
-
             // Generate the anti-forgery token and pass it to the view
             var tokens = HttpContext.RequestServices.GetService<Microsoft.AspNetCore.Antiforgery.IAntiforgery>();
             var tokenSet = tokens.GetAndStoreTokens(HttpContext);
@@ -241,7 +239,6 @@ namespace App.Areas.Home.Controllers
 
             return View(cart);
         }
-
         [Route("/removecart/{itemId?}")]
 
         [HttpPost]
@@ -278,28 +275,13 @@ namespace App.Areas.Home.Controllers
 
             return Json(new { success = true });
         }
+
         [HttpPost]
         [Route("/updatecart")]
         public async Task<IActionResult> UpdateCart([FromBody] List<CartItem> updatedCart)
         {
             var user = await GetCurrentUserAsync();
-            string userId = user?.Id;
-
-            foreach (var v in updatedCart)
-            {
-                var productVariant = await _context.productVariants
-                                                    .Include(pv => pv.Product)
-                                                    .FirstOrDefaultAsync(pv => pv.Id == v.VariantId);
-
-                if (productVariant == null)
-                {
-                    TempData["ErrorMessage"] = $"Product variant with ID {v.VariantId} not found.";
-                    return NotFound(new { success = false, message = $"Product variant with ID {v.VariantId} not found." });
-                }
-
-                // Assign the fetched product variant to the cart item
-                v.Variant = productVariant;
-            }
+            string userId = user?.Id;  // Get the user ID if authenticated
 
             // Update cart items in the cart service
             _cartService.SaveCartItems(userId, updatedCart);
@@ -307,7 +289,6 @@ namespace App.Areas.Home.Controllers
 
             return Ok(new { success = true });
         }
-
 
 
 
