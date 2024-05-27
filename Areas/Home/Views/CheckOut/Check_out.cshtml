@@ -32,8 +32,7 @@
         <div class="grid">
             <div class="is-large">
                 <nav style="text-align: center; width: 100%;" class="woocommerce-breadcrumb breadcrumbs">
-                    <a asp-area="Home" asp-controller="ProductView"
-                                        asp-action="Cart">SHOPPING CART</a>
+                    <a asp-area="Home" asp-controller="ProductView" asp-action="Cart">SHOPPING CART</a>
                     <span style="font-weight: 100;" class="divider">></span>
                     <a style="color: black;" href="#">CHECKOUT DETAILS</a>
                     <span style="font-weight: 100;" class="divider">></span>
@@ -64,12 +63,12 @@
                             </div>
                             <div style="text-align: right;">
                                 <label style="width: 30%; padding-top: 20px;">
-                                    <input type="checkbox" id="toggle-address"> Dùng Địa Chỉ Khác
+                                    <input type="checkbox" id="toggle-address" checked="true"> Dùng Địa Chỉ Mặc Định
                                 </label>
                             </div>
                         }
                         <div class="text_box" id="add-address-form"
-                            style="@(Model.HomeAddress != null ? "display: none;" : "")">
+                            style="@(Model.HomeAddress != null ? "display: show;" : "")">
                             <div>
                                 <label style="padding: 2px;"></label>
                                 <input type="text" id="streetNumber" class="form-control mb-2"
@@ -275,27 +274,45 @@
 
             $('#toggle-address').change(function () {
                 if (this.checked) {
-                    $('#add-address-form').show();
-                } else {
                     $('#add-address-form').hide();
+                } else {
+                    $('#add-address-form').show();
                 }
             });
 
             $('input[name="check_GH"]').change(function () {
                 if ($('#pickupInStore').is(':checked')) {
                     $('#addressSelection').hide();
+                    setStoreAddress();
                 } else {
                     $('#addressSelection').show();
+                    resetAddress();
                 }
             });
 
             if ($('#pickupInStore').is(':checked')) {
                 $('#addressSelection').hide();
+                setStoreAddress();
+            } else {
+                resetAddress();
             }
 
             function getSelectedText(elementId) {
                 var element = document.getElementById(elementId);
                 return element.options[element.selectedIndex].text;
+            }
+
+            function setStoreAddress() {
+                // Set these values according to your store's address
+                const storeAddress = '123 Store St, Store City, Store Province';
+                $('#defaultAddress').val(storeAddress);
+                $('#defaultAddress').show();
+            }
+
+            function resetAddress() {
+                var address = '@Html.Raw(Model.HomeAddress)'
+                $('#defaultAddress').val(address);
+                $('#defaultAddress').show();
             }
 
             var isLoggedIn = '@User.Identity.IsAuthenticated'.toLowerCase();
@@ -316,7 +333,7 @@
                 var cartItemIdsJson = '@Html.Raw(cartItemIdsJson)';
                 var antiForgeryToken = $('#antiForgeryToken').val();
 
-                var shippingAddress = isOtherAddressChecked ?
+                var shippingAddress = !isOtherAddressChecked ?
                     `${streetNumber}, ${selectedWardText}, ${selectedDistrictText}, ${selectedProvinceText}` :
                     homeAddress || `${streetNumber}, ${selectedWardText}, ${selectedDistrictText}, ${selectedProvinceText}`;
 
