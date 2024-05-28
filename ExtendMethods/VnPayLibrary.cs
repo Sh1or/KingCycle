@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
+using App.Utilities;
 
 namespace XEDAPVIP.ExtendMethods
 {
@@ -31,42 +31,52 @@ namespace XEDAPVIP.ExtendMethods
 
         public string CreateRequestUrl(string baseUrl, string vnp_HashSecret)
         {
-            var data = new StringBuilder();
-            foreach (var kv in _requestData)
+            StringBuilder data = new StringBuilder();
+            foreach (KeyValuePair<string, string> kv in _requestData)
             {
-                if (data.Length > 0)
+                if (!String.IsNullOrEmpty(kv.Value))
                 {
-                    data.Append("&");
+                    data.Append(WebUtility.UrlEncode(kv.Key) + "=" + WebUtility.UrlEncode(kv.Value) + "&");
                 }
-                data.Append($"{kv.Key}={WebUtility.UrlEncode(kv.Value)}");
             }
+            string queryString = data.ToString();
 
-            var rawData = string.Join("&", _requestData.Select(kvp => $"{kvp.Key}={kvp.Value}"));
-            var vnpSecureHash = HmacSHA512(vnp_HashSecret, rawData);
-            data.Append($"&vnp_SecureHash={vnpSecureHash}");
+            baseUrl += "?" + queryString;
+            String signData = queryString;
+            if (signData.Length > 0)
+            {
 
-            return $"{baseUrl}?{data}";
+                signData = signData.Remove(data.Length - 1, 1);
+            }
+            string vnp_SecureHash = Utils.HmacSHA512(vnp_HashSecret, signData);
+            baseUrl += "vnp_SecureHash=" + vnp_SecureHash;
+
+            return baseUrl;
         }
 
         public bool ValidateSignature(string inputHash, string secretKey)
         {
             var responseRawData = string.Join("&", _responseData.Where(kvp => kvp.Key != "vnp_SecureHash").Select(kvp => $"{kvp.Key}={kvp.Value}"));
             var myChecksum = HmacSHA512(secretKey, responseRawData);
+
+
             return myChecksum.Equals(inputHash, StringComparison.InvariantCultureIgnoreCase);
         }
 
         private string HmacSHA512(string key, string inputData)
         {
             var hash = new StringBuilder();
-            var keyByte = Encoding.UTF8.GetBytes(key);
-            using (var hmacsha512 = new HMACSHA512(keyByte))
+            byte[] keyBytes = Encoding.UTF8.GetBytes(key);
+            byte[] inputBytes = Encoding.UTF8.GetBytes(inputData);
+            using (var hmac = new HMACSHA512(keyBytes))
             {
-                var hashValue = hmacsha512.ComputeHash(Encoding.UTF8.GetBytes(inputData));
+                byte[] hashValue = hmac.ComputeHash(inputBytes);
                 foreach (var theByte in hashValue)
                 {
                     hash.Append(theByte.ToString("x2"));
                 }
             }
+
             return hash.ToString();
         }
     }

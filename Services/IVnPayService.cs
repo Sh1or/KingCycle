@@ -45,7 +45,7 @@ namespace XEDAPVIP.Services
             vnpay.AddRequestData("vnp_CurrCode", "VND");
             vnpay.AddRequestData("vnp_IpAddr", context.Connection.RemoteIpAddress.ToString());
             vnpay.AddRequestData("vnp_Locale", "vn");
-            vnpay.AddRequestData("vnp_OrderInfo", $"Order {order.Id}");
+            vnpay.AddRequestData("vnp_OrderInfo", $"Thanh toan don hang {order.Id}");
             vnpay.AddRequestData("vnp_OrderType", "other");
             vnpay.AddRequestData("vnp_ReturnUrl", returnUrl);
             vnpay.AddRequestData("vnp_TxnRef", order.Id.ToString());

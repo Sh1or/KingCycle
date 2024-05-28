@@ -196,7 +196,7 @@
                                 <tr class="product_cart_buys check" colspan="2">
                                     <div class="radio-buttons">
                                         <label class="radio-container">Thanh Toán Qua Ngân Hàng/VNPay
-                                            <input type="radio" name="checkTT" value="Bank/VNPay" checked>
+                                            <input type="radio" name="checkTT" value="VNPAY" checked>
                                             <span class="radio-checkmark"></span>
                                         </label>
                                         <label class="radio-container">Thanh Toán Trực Tiếp(COD)
@@ -371,9 +371,12 @@
                     contentType: 'application/json',
                     data: JSON.stringify(data),
                     success: function (response) {
-                        // Handle success, e.g., show a success message or redirect to a thank you page
-                        location.reload();
-                        console.log('Order placed successfully:', response);
+                        if (response && response.url) {
+                            window.location.href = response.url; // Đây là dòng quan trọng
+                        } else {
+                            // Nếu không có URL, có thể tải lại trang hoặc hiển thị thông báo
+                            location.reload();
+                        }
                     },
                     error: function (error) {
                         // Handle error, e.g., show an error message

@@ -1,6 +1,7 @@
 using App.Models;
 using Microsoft.EntityFrameworkCore;
 using XEDAPVIP.Models;
+using XEDAPVIP.Services;
 
 public class OrderService
 {
@@ -9,14 +10,16 @@ public class OrderService
     private readonly HttpContext _httpContext;
     private readonly CartService _cartService;
     private readonly IEmailSender _emailSender;
+    private readonly IVnPayService _vnPayService;
 
-    public OrderService(AppDbContext context, IHttpContextAccessor contextAccessor, CartService cartService, IEmailSender emailSender)
+    public OrderService(AppDbContext context, IHttpContextAccessor contextAccessor, CartService cartService, IEmailSender emailSender, IVnPayService vnPayService)
     {
         _context = context;
         _contextAccessor = contextAccessor;
         _httpContext = contextAccessor.HttpContext;
         _cartService = cartService;
         _emailSender = emailSender;
+        _vnPayService = vnPayService;
     }
 
     // Create a new order

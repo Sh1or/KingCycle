@@ -153,7 +153,31 @@ namespace App.Areas.Home.Controllers
                     return BadRequest("No valid cart item IDs found.");
                 }
 
-                var order = await _orderService.CreateOrderAsync(
+                var order = new Order
+                {
+                    UserId = orderRequest.UserId,
+                    UserName = orderRequest.FullName,
+                    PhoneNumber = orderRequest.PhoneNumber,
+                    UserEmail = orderRequest.EmailAddress,
+                    OrderNote = orderRequest.OrderNote,
+                    OrderDate = DateTime.Now,
+                    Status = orderRequest.Status,
+                    ShippingAddress = orderRequest.ShippingAddress,
+                    ShippingMethod = orderRequest.ShippingMethod,
+                    PaymentMethod = orderRequest.PaymentMethod,
+                    TotalAmount = orderRequest.TotalAmount
+                };
+
+                if (orderRequest.PaymentMethod == "VNPAY")
+                {
+                    // Create VNPay payment URL
+                    var paymentUrl = _vnPayService.CreatePaymentUrl(order, HttpContext);
+
+                    return Ok(new { url = paymentUrl });
+
+                }
+
+                var createdOrder = await _orderService.CreateOrderAsync(
                     orderRequest.UserId,
                     orderRequest.FullName,
                     orderRequest.PhoneNumber,
@@ -166,6 +190,7 @@ namespace App.Areas.Home.Controllers
                     orderRequest.TotalAmount,
                     orderRequest.Status
                 );
+
                 if (order.UserId == null)
                 {
                     TempData["SuccessMessage"] = "Đặt hàng thành công. Vui lòng kiểm tra Email để xem chi tiết đơn hàng";
@@ -173,7 +198,6 @@ namespace App.Areas.Home.Controllers
                 else
                 {
                     TempData["SuccessMessage"] = "Đặt hàng thành công. Vui lòng kiểm tra Email hoặc vào Thông tin cá nhân để xem chi tiết đơn hàng";
-
                 }
 
                 return Ok(new { success = true });
@@ -184,6 +208,26 @@ namespace App.Areas.Home.Controllers
                 return StatusCode(500, "An error occurred while placing the order.");
             }
         }
+
+
+        public bool PaymentCallback()
+        {
+            var query = HttpContext.Request.Query;
+
+            if (_vnPayService.ValidateResponse(query))
+            {
+                _logger.LogInformation("VNPAY response is valid.");
+                // Handle successful validation, e.g., update order status
+                return true;
+            }
+            else
+            {
+                _logger.LogWarning("VNPAY response is invalid.");
+                // Handle failed validation
+                return false;
+            }
+        }
+
 
         [HttpGet]
 
