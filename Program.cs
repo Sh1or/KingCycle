@@ -136,8 +136,13 @@ builder.Services.AddAuthorization(option =>
     });
 });
 
-builder.Services.Configure<VnPaySettings>(builder.Configuration.GetSection("VnPay"));
-builder.Services.AddTransient<IVnPayService, VnPayService>();
+// var mailsetting = appConfiguration.GetSection("MailSettings");
+// builder.Services.Configure<MailSettings>(mailsetting);
+// builder.Services.AddSingleton<IEmailSender, SendMailService>();
+builder.Services.AddOptions();
+var vnPaySettings = appConfiguration.GetSection("VnPaySettings");
+builder.Services.Configure<VnPaySettings>(vnPaySettings);
+builder.Services.AddSingleton<IVnPayService, VnPayService>();
 builder.Services.AddTransient<CartService>();
 builder.Services.AddTransient<OrderService>();
 
