@@ -139,7 +139,7 @@ public class OrderService
                 }
 
                 // Update the path in the database or in-memory object if necessary
-                orderDetail.ProductImage = $"/images/order/{productSlug}order/{mainImageFileName}";
+                orderDetail.ProductImage = $"/images/order/{productSlug}-{orderDetail.Variant.Id}-{orderDetail.OrderId}/{mainImageFileName}";
             }
             catch (UnauthorizedAccessException ex)
             {
