@@ -5,6 +5,8 @@ using App.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using XEDAPVIP.Areas.Home.Models.CheckOut;
+using XEDAPVIP.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -134,7 +136,8 @@ builder.Services.AddAuthorization(option =>
     });
 });
 
-// Register CartService
+builder.Services.Configure<VnPaySettings>(builder.Configuration.GetSection("VnPay"));
+builder.Services.AddTransient<IVnPayService, VnPayService>();
 builder.Services.AddTransient<CartService>();
 builder.Services.AddTransient<OrderService>();
 

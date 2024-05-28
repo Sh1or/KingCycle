@@ -393,7 +393,7 @@
                 var selectedWard = $('#SelectedWard').val();
 
                 function validateEmail(emailAddress) {
-                    var regex = /^[_a-z0-9-A-Z-]+(\.[_a-z0-9-A-Z-]+)*@@[a-z0-9-A-Z-]+(\.[a-z0-9-A-Z-]+)*(\.[a-z]{2,4})$/;
+                    var regex = /^[a-zA-Z0-9._%+-]+@@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
                     return regex.test(emailAddress);
                 }
 

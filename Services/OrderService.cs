@@ -8,13 +8,15 @@ public class OrderService
     private readonly IHttpContextAccessor _contextAccessor;
     private readonly HttpContext _httpContext;
     private readonly CartService _cartService;
+    private readonly IEmailSender _emailSender;
 
-    public OrderService(AppDbContext context, IHttpContextAccessor contextAccessor, CartService cartService)
+    public OrderService(AppDbContext context, IHttpContextAccessor contextAccessor, CartService cartService, IEmailSender emailSender)
     {
         _context = context;
         _contextAccessor = contextAccessor;
         _httpContext = contextAccessor.HttpContext;
         _cartService = cartService;
+        _emailSender = emailSender;
     }
 
     // Create a new order
@@ -84,6 +86,7 @@ public class OrderService
         await SaveOrderImage(order.OrderDetails);
         await UpdateProductQuantities(cartItems);
 
+        await _emailSender.SendOrderConfirmationEmailAsync(order);
         // Remove Cart Items and Update Product Quantities
         if (string.IsNullOrEmpty(userId))
         {
