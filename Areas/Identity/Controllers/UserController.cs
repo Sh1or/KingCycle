@@ -387,6 +387,15 @@ namespace App.Areas.Identity.Controllers
                     }).ToList()
                 })
                 .ToListAsync();
+            var countPaidOrder = 0;
+            var countOrder = 0;
+            foreach (var o in orders)
+            {
+                countOrder++;
+                if (o.Status == "Paid") countPaidOrder += o.TotalAmount;
+            }
+            ViewBag.countPaidOrder = countPaidOrder;
+            ViewBag.countOrder = countOrder;
 
             var model = new UserDetailViewModel
             {
@@ -409,5 +418,58 @@ namespace App.Areas.Identity.Controllers
             public string HomeAddress { get; set; }
             public List<OrderViewModel> Orders { get; set; }
         }
+        [HttpPost("{id}")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> LockUser(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                return NotFound("Không tìm thấy user");
+            }
+
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound($"Không tìm thấy user, id = {id}.");
+            }
+
+            var result = await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.MaxValue);
+            if (!result.Succeeded)
+            {
+                ModelState.AddModelError(string.Empty, "Lỗi khi khoá tài khoản.");
+                return RedirectToAction("Index");
+            }
+            TempData["SuccessMessage"] = $"Đã khoá tài khoản: {user.UserName}";
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost("{id}")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UnlockUser(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                return NotFound("Không tìm thấy user");
+            }
+
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound($"Không tìm thấy user, id = {id}.");
+            }
+
+            var result = await _userManager.SetLockoutEndDateAsync(user, null);
+            if (!result.Succeeded)
+            {
+                ModelState.AddModelError(string.Empty, "Lỗi khi mở khoá tài khoản.");
+                return RedirectToAction("Index");
+            }
+
+            TempData["SuccessMessage"] = $"Đã mở khoá tài khoản: {user.UserName}";
+
+            return RedirectToAction("Index");
+        }
+
     }
 }
