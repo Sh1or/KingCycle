@@ -71,13 +71,13 @@
         <div class="grid">
             <div class="product_main product_main_sale">
                 <!--gio vang gia soc-->
-                <div class="collect collect_sale_giovanggiasoc">
+                <div style="margin: 100px 0;" class="collect collect_sale_giovanggiasoc">
                     <h1 style="transform: translate(130%, -50%);">
                         <span>
                             GIỜ VÀNG GIÁ SỐC
                         </span>
                     </h1>
-                    <div class="pox-1">
+                    <div style="padding: 10px;"  class="pox-1">
                         @foreach( var product in Hotsale){
                             var categoryOrBrandSlug = product.Brand?.Slug ??product.ProductCategories.FirstOrDefault()?.Category.Slug;
                             <div class="tst-sale">
@@ -128,14 +128,8 @@
                     </div>
                     
                 </div>
-                <div style="padding-bottom: 50px;" class="collect-more_product collect-more_product_sale">
-                    <a href="" class="button-more_product">
-                        <span style="color: blue; font-size: 13px;">Xem Thêm</span>
-                        <i style="color: blue; font-size: 13px;" class="fa-solid fa-caret-down"></i>
-                    </a>
-                </div>
                 <!--giamgiacaonhat-->
-                <div class="collect">
+                <div style="margin: 100px 0;" class="collect">
                     <h1 style="transform: translate(130%, -100%); z-index: 20;">
                         <span>
                             GIẢM GIÁ CAO NHẤT
@@ -181,12 +175,6 @@
                             
                         </div>
                     </div>
-                </div>
-                <div class="collect-more_product collect-more_product_sale">
-                    <a href="" class="button-more_product">
-                        <span style="color: blue; font-size: 13px;">Xem Thêm</span>
-                        <i style="color: blue; font-size: 13px;" class="fa-solid fa-caret-down"></i>
-                    </a>
                 </div>
                 <!--xedapdiahinhkhuyenmai-->
                 <div style="border: none;" class="collect collect_sale_giovanggiasoc">

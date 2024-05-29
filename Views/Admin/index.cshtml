@@ -4,43 +4,89 @@
     ViewData["Title"] = "Dashboard";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
+<style>
+    .tst-011 {}
+
+    .tst_0 {
+        padding: 10px;
+        display: flex;
+        border: 2px solid;
+        border-radius: 30px;
+    }
+
+    .tst-012 {
+        padding: 0 20px;
+    }
+
+    .tst-013 {
+        margin-bottom: 0;
+        font-size: 1.15rem;
+    }
+</style>
 
 <body>
     <div class="container mt-3">
         <!-- Row for the summary cards -->
-        <div class="row">
-            <div class="col-lg-4 mb-4">
-                <div class="card h-100">
-                    <h5 class="card-header">Người dùng</h5>
-                    <div class="card-body">
-                        <p class="card-text">Total Users: @Model.TotalUsers</p>
+        <div style="padding-bottom: 50px;" class="row">
+            <div style="width: 30%;" class="">
+                <div class="tst-011">
+                    <div class="tst_0">
+                        <div class="tst-011">
+                            <h5 class="tst-012"> <i style="font-size: 2rem;" class="fa-solid fa-user"></i></h5>
+                        </div>
+                        <div class="">
+                            <p class="tst-013">Tổng Số Người Dùng: @Model.TotalUsers</p>
+                        </div>
+                    </div>
+                </div>
+                <div style="padding-top: 20px;" class="tst-011">
+                    <div class="tst_0">
+                        <div class="tst-011">
+                            <h5 class="tst-012"> <i style="font-size: 2rem;" class="fa-solid fa-money-bills"></i></h5>
+                        </div>
+                        <div class="">
+                            <p class="tst-013">Tổng Số Đơn Hàng: @Model.TotalOrders</p>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-4 mb-4">
+
+            <div style="width: 40%; height: 150px;" class="col-lg-4">
                 <div class="card h-100">
-                    <h5 class="card-header">Đơn hàng</h5>
-                    <div class="card-body">
-                        <p class="card-text">Tổng Đơn Hàng: @Model.TotalOrders</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 mb-4">
-                <div class="card h-100">
-                    <h5 class="card-header">Doanh thu</h5>
+                    <h5 class="card-header"><i class="fa-solid fa-chart-simple"></i> Doanh thu</h5>
                     <div class="card-body">
                         <p class="card-text">Tổng Doanh Thu: @Model.TotalRevenue.ToString("N0") VNĐ</p>
-                        <p class="card-text">% Tăng so với:</p>
-                        <ul>
-                            <li>1 ngày trước: @Model.PercentageChangePreviousDay.ToString("N2")%</li>
-                            <li>1 tuần trước: @Model.PercentageChangePreviousWeek.ToString("N2")%</li>
-                            <li>1 tháng trước: @Model.PercentageChangePreviousMonth.ToString("N2")%</li>
-                        </ul>
                     </div>
                 </div>
             </div>
-        </div>
+            <div style="width: 30%;" class="">
+                <div class="tst-011">
+                    <div class="card h-100">
+                        <h5 class="card-header"><i class="fa-solid fa-chart-simple"></i> Doanh thu tăng theo ngày</h5>
+                        <div class="card-body">
+                            <p class="card-text">1 ngày trước: @Model.PercentageChangePreviousDay.ToString("N2")%</p>
+                        </div>
+                    </div>
+                </div>
+                <div style="padding-top: 20px;" class="tst-011">
+                    <div class="card h-100">
+                        <h5 class="card-header"><i class="fa-solid fa-chart-simple"></i> Doanh thu tăng theo Tuần</h5>
+                        <div class="card-body">
+                            <p class="card-text">1 tuần trước: @Model.PercentageChangePreviousWeek.ToString("N2")%</p>
+                        </div>
+                    </div>
+                </div>
+                <div style="padding-top: 20px;" class="tst-011">
+                    <div class="card h-100">
+                        <h5 class="card-header"><i class="fa-solid fa-chart-simple"></i> Doanh thu tăng theo Tháng</h5>
+                        <div class="card-body">
+                            <p class="card-text">1 tháng trước: @Model.PercentageChangePreviousMonth.ToString("N2")%</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
+        </div>
         <!-- Row for the charts -->
         <div class="row">
             <div class="col-md-6 mb-4">

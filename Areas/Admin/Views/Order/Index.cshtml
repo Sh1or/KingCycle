@@ -5,6 +5,13 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
+<div id="customAlert" class="custom-alert">
+    <div class="popup-content">
+        <p>Bạn có chắc chắn muốn xóa mặt hàng này khỏi giỏ hàng?</p>
+        <button id="confirmBtn" class="confirm-btn">Xác nhận</button>
+        <button id="cancelBtn" class="cancel-btn">Hủy</button>
+    </div>
+</div>
 <div class="container mt-4">
     <div class="row mb-3">
         <div class="col-md-3">
@@ -22,8 +29,8 @@
             </div>
         </div>
         <div class="col-md-3">
-            <div class="form-group">
-                <label for="searchInput">Tìm kiếm:</label>
+            <div style="padding-top: 10px;" class="form-group">
+                <label style="font-weight: bold;" for="searchInput">Tìm kiếm:</label>
                 <input type="text" id="searchInput" class="form-control" onkeyup="searchOrders()"
                     placeholder="Tìm theo tên hoặc email khách hàng">
             </div>
@@ -33,7 +40,9 @@
         var orderCount = ViewBag.orderCount;
     }
     <p>Số lượng đơn hàng: @orderCount </p>
-    <div class="table-responsive">
+    <div style="display: block;
+        width: 100%;
+        overflow-x: auto;">
         <table class="table table-bordered table-striped">
             <thead style="position: sticky; top: 0; background: white;">
                 <tr>
@@ -160,6 +169,30 @@
     .container-xl {
         max-width: 2000px;
     }
+
+    .custom-alert {
+        display: none;
+        top: 0;
+        right: 1%;
+        position: fixed;
+        padding: 10px;
+        color: #fff;
+        margin-bottom: 10px;
+        width: 400px;
+        border-radius: 5px;
+        --color: #0abf30;
+        background-image: linear-gradient(to right, #0abf3055, #22242f 30%);
+        animation: show 0.3s ease 1 forwards;
+        z-index: 1000;
+    }
+
+    .cancel-btn,
+    .confirm-btn {
+        width: 100px;
+        border: 1px solid;
+        padding: 5px;
+        border-radius: 10px;
+    }
 </style>
 
 <script>
@@ -284,8 +317,20 @@
         });
     }
 
-    function confirmDelete(orderId) {
-        if (confirm('Bạn có chắc chắn muốn xoá đơn hàng này không?')) {
+    function showCustomConfirm(orderId) {
+        // Hiển thị hộp thoại xác nhận tùy chỉnh
+        var customAlert = document.getElementById('customAlert');
+        customAlert.style.display = 'block';
+
+        // Xóa sự kiện click trước đó nếu có
+        var confirmBtn = document.getElementById('confirmBtn');
+        var cancelBtn = document.getElementById('cancelBtn');
+
+        confirmBtn.onclick = function () {
+            // Ẩn hộp thoại
+            customAlert.style.display = 'none';
+
+            // Thực hiện AJAX request để xóa đơn hàng
             $.ajax({
                 url: '@Url.Action("Delete", "Order")',
                 type: 'POST',
@@ -293,18 +338,18 @@
                     id: orderId,
                     __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
                 },
-                success: function (response) {
-                    if (response.success) {
-                        alert('Đơn hàng đã được xoá thành công.');
-                        location.reload();
-                    } else {
-                        alert('Không thể xoá đơn hàng.');
-                    }
-                },
-                error: function () {
-                    alert('Xoá đơn hàng thất bại.');
-                }
+                complete: function () {
+                location.reload(); // Tải lại trang sau khi yêu cầu hoàn tất
+                 }
             });
-        }
+        };
+
+        cancelBtn.onclick = function () {
+            customAlert.style.display = 'none';
+        };
+    }
+
+    function confirmDelete(orderId) {
+        showCustomConfirm(orderId);
     }
 </script>
