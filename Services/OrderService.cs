@@ -25,7 +25,7 @@ public class OrderService
     }
 
     // Create a new order
-    public async Task<Order> CreateOrderAsync(string? userId, string userName, string phoneNumber, string userEmail, string? orderNote, List<int> cartItemIds, string shippingAddress, string shippingMethod, string paymentMethod, string totalAmount, string status)
+    public async Task<Order> CreateOrderAsync(string? userId, string userName, string phoneNumber, string userEmail, string? orderNote, List<int> cartItemIds, string shippingAddress, string shippingMethod, string paymentMethod, int totalAmount, string status)
     {
         List<CartItem> cartItems;
 
