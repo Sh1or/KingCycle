@@ -6,7 +6,6 @@
 }
 
 <div class="container mt-4">
-    <h2>Quản lý đơn hàng</h2>
     <div class="row mb-3">
         <div class="col-md-3">
             <div class="form-group">
@@ -65,16 +64,16 @@
                         <td>@order.ShippingMethod</td>
                         <td>@order.PaymentMethod</td>
                         <td>
-                            <div class="btn-group" role="group">
+                            <div style="display: block;" class="btn-group" role="group">
                                 @if (order.Status != "Completed" && order.Status != "Canceled" && order.Status != "Failed")
                                 {
-                                    <button class="btn btn-primary btn-sm"
+                                    <button style="width: 100px; margin-right: 0; margin-bottom: 1%;" class="btn btn-primary btn-sm"
                                         onclick="openEditModal(@order.Id, '@order.Status')">Sửa</button>
                                 }
-                                <a class="btn btn-info btn-sm" asp-action="Details" asp-route-id="@order.Id">Chi tiết</a>
+                                <a style="width: 100px;  margin-right: 0; margin-bottom: 1%;" class="btn btn-info btn-sm" asp-action="Details" asp-route-id="@order.Id">Chi tiết</a>
                                 @if (order.Status == "Canceled" || order.Status == "Failed")
                                 {
-                                    <button class="btn btn-danger btn-sm" onclick="confirmDelete(@order.Id)">Xóa</button>
+                                    <button style="width: 100px;  margin-right: 0;" class="btn btn-danger btn-sm" onclick="confirmDelete(@order.Id)">Xóa</button>
                                 }
                             </div>
                         </td>

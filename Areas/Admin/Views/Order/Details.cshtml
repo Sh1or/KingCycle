@@ -6,49 +6,58 @@
 }
 
 
-
+<style>
+    .txx{
+        font-size: 1rem;
+        padding: 5px;
+    }
+    dl.row{
+        border: 2px solid
+    }
+    .col-sm-3.txx{
+        border: 1px solid ;
+    }
+</style>
 
 <body>
 
     <div class="container">
-        <h4>Order Details</h4>
-        <hr />
         <dl class="row">
-            <dt class="col-sm-2">Mã Đơn Hàng</dt>
-            <dd class="col-sm-10">@Html.DisplayFor(model => model.OrderId)</dd>
+            <dt class=" col-sm-3  txx">Mã Đơn Hàng</dt>
+            <dd class=" col-sm-7 txx">@Html.DisplayFor(model => model.OrderId)</dd>
 
-            <dt class="col-sm-2">Tên Người Đặt</dt>
-            <dd class="col-sm-10">@Html.DisplayFor(model => model.UserName)</dd>
+            <dt class="  col-sm-3 txx">Tên Người Đặt</dt>
+            <dd class=" col-sm-7 txx">@Html.DisplayFor(model => model.UserName)</dd>
 
-            <dt class="col-sm-2">Email</dt>
-            <dd class="col-sm-10">@Html.DisplayFor(model => model.UserEmail)</dd>
+            <dt class="  col-sm-3 txx">Email</dt>
+            <dd class=" col-sm-7 txx">@Html.DisplayFor(model => model.UserEmail)</dd>
 
-            <dt class="col-sm-2">Số Điện Thoại</dt>
-            <dd class="col-sm-10">@Html.DisplayFor(model => model.PhoneNumber)</dd>
+            <dt class="  col-sm-3 txx">Số Điện Thoại</dt>
+            <dd class=" col-sm-7 txx">@Html.DisplayFor(model => model.PhoneNumber)</dd>
 
-            <dt class="col-sm-2">Ghi chú</dt>
-            <dd class="col-sm-10">@Html.DisplayFor(model => model.OrderNote)</dd>
+            <dt class="  col-sm-3 txx">Ghi chú</dt>
+            <dd class=" col-sm-7 txx">@Html.DisplayFor(model => model.OrderNote)</dd>
 
-            <dt class="col-sm-2">Ngày Đặt Hàng</dt>
-            <dd class="col-sm-10">@Html.DisplayFor(model => model.OrderDate)</dd>
+            <dt class="  col-sm-3 txx">Ngày Đặt Hàng</dt>
+            <dd class=" col-sm-7 txx">@Html.DisplayFor(model => model.OrderDate)</dd>
 
-            <dt class="col-sm-2">Ngày Giao Hàng</dt>
-            <dd class="col-sm-10">@Html.DisplayFor(model => model.ShippedDate)</dd>
+            <dt class="  col-sm-3 txx">Ngày Giao Hàng</dt>
+            <dd class=" col-sm-7 txx">@Html.DisplayFor(model => model.ShippedDate)</dd>
 
-            <dt class="col-sm-2">Tổng Giá Đơn Hàng</dt>
-            <dd class="col-sm-10">@Html.DisplayFor(model => model.TotalAmount)</dd>
+            <dt class="  col-sm-3 txx">Tổng Giá Đơn Hàng</dt>
+            <dd class=" col-sm-7 txx">@Html.DisplayFor(model => model.TotalAmount)</dd>
 
-            <dt class="col-sm-2">Trạng Thái Đơn Hàng</dt>
-            <dd class="col-sm-10">@Html.DisplayFor(model => model.Status)</dd>
+            <dt class="  col-sm-3 txx">Trạng Thái Đơn Hàng</dt>
+            <dd class=" col-sm-7 txx">@Html.DisplayFor(model => model.Status)</dd>
 
-            <dt class="col-sm-2">Phương Thức Nhận Hàng</dt>
-            <dd class="col-sm-10">@Html.DisplayFor(model => model.ShippingMethod)</dd>
+            <dt class="  col-sm-3 txx">Phương Thức Nhận Hàng</dt>
+            <dd class=" col-sm-7 txx">@Html.DisplayFor(model => model.ShippingMethod)</dd>
 
-            <dt class="col-sm-2">Địa Chỉ Giao Hàng</dt>
-            <dd class="col-sm-10">@Html.DisplayFor(model => model.ShippingAddress)</dd>
+            <dt class="  col-sm-3 txx">Địa Chỉ Giao Hàng</dt>
+            <dd class=" col-sm-7 txx">@Html.DisplayFor(model => model.ShippingAddress)</dd>
 
-            <dt class="col-sm-2">Phương Thức Thanh Toán</dt>
-            <dd class="col-sm-10">@Html.DisplayFor(model => model.PaymentMethod)</dd>
+            <dt class="  col-sm-3 txx">Phương Thức Thanh Toán</dt>
+            <dd class=" col-sm-7 txx">@Html.DisplayFor(model => model.PaymentMethod)</dd>
         </dl>
 
         <h4>Products in Order</h4>
