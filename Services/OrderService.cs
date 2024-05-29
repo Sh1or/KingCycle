@@ -34,6 +34,19 @@ public class OrderService
             // Guest user - retrieve cart items from session
             cartItems = _cartService.GetCartItems();
             userId = "Guest";
+            foreach (var c in cartItems)
+            {
+                if (c.VariantId == 0)
+                {
+                    c.VariantId = c.Variant.Id;
+
+                }
+                if (c.Variant == null)
+                {
+                    c.Variant = await _context.productVariants.Include(v => v.Product)
+            .FirstOrDefaultAsync(p => p.Id == c.VariantId);
+                }
+            }
         }
         else
         {
@@ -73,7 +86,7 @@ public class OrderService
         var orderDetails = cartItems.Select(ci => new OrderDetail
         {
             OrderId = order.Id, // Set the OrderId
-            VariantId = ci.Variant.Id,
+            VariantId = ci.VariantId,
             ProductName = ci.Variant.Product.Name,
             ProductDescription = $"Màu sắc: {ci.Variant.Color}, Kích thước: {ci.Variant.Size}",
             ProductImage = ci.Variant.Product.MainImage,
@@ -90,8 +103,8 @@ public class OrderService
         await _context.SaveChangesAsync();
         await SaveOrderImage(order.OrderDetails);
         await UpdateProductQuantities(cartItems);
+        if (order.PaymentMethod == "COD") await _emailSender.SendOrderConfirmationEmailAsync(order);
 
-        await _emailSender.SendOrderConfirmationEmailAsync(order);
         // Remove Cart Items and Update Product Quantities
         if (string.IsNullOrEmpty(userId))
         {
