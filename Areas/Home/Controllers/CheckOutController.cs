@@ -8,7 +8,9 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using XEDAPVIP.Areas.Home.Models.CheckOut;
 using XEDAPVIP.Models;
+using XEDAPVIP.Services;
 using static XEDAPVIP.Areas.Home.Models.CheckOut.ProfileCheckoutModel;
+
 namespace App.Areas.Home.Controllers
 {
     [Area("Home")]
@@ -16,13 +18,15 @@ namespace App.Areas.Home.Controllers
     {
         private readonly AppDbContext _context;
         private readonly ILogger<ProductViewController> _logger;
+        private readonly IVnPayService _vnPayService;
         private readonly UserManager<AppUser> _userManager;
         private readonly CacheService _cacheService;
         private readonly CartService _cartService;
         private readonly HttpClient _httpClient;
         private readonly OrderService _orderService;
+
         public CheckOutController(AppDbContext context, ILogger<ProductViewController> logger, UserManager<AppUser> userManager, CacheService cacheService,
-        CartService cartService, OrderService orderService)
+            CartService cartService, OrderService orderService, IVnPayService vnPayService)
         {
             _context = context;
             _logger = logger;
@@ -30,8 +34,94 @@ namespace App.Areas.Home.Controllers
             _cacheService = cacheService;
             _cartService = cartService;
             _orderService = orderService;
+            _vnPayService = vnPayService;
             _httpClient = new HttpClient();
         }
+
+        public async Task<IActionResult> VnPayReturn()
+        {
+            if (_vnPayService.ValidateResponse(Request.Query))
+            {
+                var transactionRef = Request.Query["vnp_TxnRef"].ToString(); // Order ID
+                var vnpTransactionStatus = Request.Query["vnp_TransactionStatus"].ToString(); // Transaction status
+
+                if (!int.TryParse(transactionRef, out int orderId))
+                {
+                    TempData["ErrorMessage"] = "Lỗi";
+                    return View("Check_out");
+                }
+
+                // Fetch the order using the transactionRef (order ID)
+                var order = await _context.Orders
+                    .Include(o => o.OrderDetails)
+                        .ThenInclude(od => od.Variant)
+                    .FirstOrDefaultAsync(o => o.Id == orderId);
+
+                if (order == null)
+                {
+                    _logger.LogWarning("Order not found for transaction reference: {TransactionRef}", transactionRef);
+                    TempData["ErrorMessage"] = "Không tìm thấy đơn hàng";
+                    return RedirectToAction(nameof(Check_out));
+                }
+
+                if (vnpTransactionStatus == "00") // Assuming "00" indicates a successful transaction
+                {
+                    order.Status = "Paid";
+                    _context.Update(order);
+                    await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Thanh toán thành công, vui lòng kiểm tra email để xem hoá đơn chi tiết";
+                    return RedirectToAction(nameof(Check_out));
+                }
+                else
+                {
+                    // Payment failed, return items to cart
+                    order.Status = "Failed";
+                    _context.Update(order);
+
+                    // Retrieve the quantities from OrderDetails and update Variants
+                    foreach (var orderDetail in order.OrderDetails)
+                    {
+                        var variant = await _context.productVariants.FindAsync(orderDetail.VariantId);
+
+                        if (variant != null)
+                        {
+                            variant.Quantity += orderDetail.Quantity;
+                            _context.Update(variant);
+                        }
+
+                        // Update CartItems
+                        var cartItem = await _context.CartItems
+                            .FirstOrDefaultAsync(ci => ci.VariantId == orderDetail.Variant.Id);
+
+                        if (cartItem != null)
+                        {
+                            cartItem.Quantity += orderDetail.Quantity;
+                            _context.Update(cartItem);
+                        }
+                        else
+                        {
+                            cartItem = new CartItem
+                            {
+                                UserId = order.UserId,
+                                VariantId = orderDetail.Variant.Id,
+                                Quantity = orderDetail.Quantity
+                            };
+                            _context.Add(cartItem);
+                        }
+                    }
+
+                    await _context.SaveChangesAsync();
+                    TempData["ErrorMessage"] = "Thanh toán thất bại, sản phẩm đã được trả lại vào giỏ hàng";
+                    return RedirectToAction(nameof(Check_out));
+                }
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Lỗi!!";
+                return RedirectToAction(nameof(Check_out));
+            }
+        }
+
 
         [Route("/Checkout", Name = "Checkout")]
         public async Task<IActionResult> Check_out()
@@ -131,8 +221,7 @@ namespace App.Areas.Home.Controllers
                     _logger.LogWarning("No valid cart item IDs found for user {UserId}.", orderRequest.UserId ?? "guest");
                     return BadRequest("No valid cart item IDs found.");
                 }
-
-                var order = await _orderService.CreateOrderAsync(
+                var createdOrder = await _orderService.CreateOrderAsync(
                     orderRequest.UserId,
                     orderRequest.FullName,
                     orderRequest.PhoneNumber,
@@ -145,8 +234,21 @@ namespace App.Areas.Home.Controllers
                     orderRequest.TotalAmount,
                     orderRequest.Status
                 );
+                if (orderRequest.PaymentMethod == "VNPAY")
+                {
 
-                TempData["SuccessMessage"] = "Đặt hàng thành công.";
+                    var paymentUrl = _vnPayService.CreatePaymentUrl(createdOrder, HttpContext);
+
+                    return Ok(new { url = paymentUrl });
+                }
+                if (orderRequest.UserId == null)
+                {
+                    TempData["SuccessMessage"] = "Đặt hàng thành công. Vui lòng kiểm tra Email để xem chi tiết đơn hàng";
+                }
+                else
+                {
+                    TempData["SuccessMessage"] = "Đặt hàng thành công. Vui lòng kiểm tra Email hoặc vào Thông tin cá nhân để xem chi tiết đơn hàng";
+                }
 
                 return Ok(new { success = true });
             }
@@ -157,8 +259,8 @@ namespace App.Areas.Home.Controllers
             }
         }
 
-        [HttpGet]
 
+        [HttpGet]
         public async Task<IActionResult> GetProvinceDistrictWard()
         {
             try
@@ -183,6 +285,7 @@ namespace App.Areas.Home.Controllers
                 return StatusCode(500);
             }
         }
+
         public async Task<List<Province>> GetProvincesAsync()
         {
             var dataDiagioiResponse = await GetProvinceDistrictWard();
@@ -200,86 +303,9 @@ namespace App.Areas.Home.Controllers
             }
         }
 
-        public async Task<JsonResult> GetDistrictsByProvinceId(string provinceId)
-        {
-            var provinces = await GetProvincesAsync();
-
-            var selectedProvince = provinces.FirstOrDefault(province => province.Id == provinceId);
-
-            if (selectedProvince != null)
-            {
-                return Json(selectedProvince.Districts);
-            }
-            else
-            {
-                return Json(new List<District>());
-            }
-        }
-
-        public async Task<JsonResult> GetWardsByDistrictId(string districtId)
-        {
-            var provinces = await GetProvincesAsync();
-
-            District selectedDistrict = null;
-            foreach (var province in provinces)
-            {
-                selectedDistrict = province.Districts.FirstOrDefault(district => district.Id == districtId);
-                if (selectedDistrict != null)
-                {
-                    break;
-                }
-            }
-
-            if (selectedDistrict != null)
-            {
-                return Json(selectedDistrict.Wards);
-            }
-            else
-            {
-                return Json(new List<Ward>());
-            }
-        }
-        private async Task<string> GetProvinceNameById(string provinceId)
-        {
-            var provinces = await GetProvincesAsync();
-            var province = provinces.FirstOrDefault(p => p.Id == provinceId);
-            return province != null ? province.Name : "";
-        }
-
-        private async Task<string> GetDistrictNameById(string districtId)
-        {
-            var provinces = await GetProvincesAsync();
-            foreach (var province in provinces)
-            {
-                var district = province.Districts.FirstOrDefault(d => d.Id == districtId);
-                if (district != null)
-                {
-                    return district.Name;
-                }
-            }
-            return "";
-        }
-
-        private async Task<string> GetWardNameById(string wardId)
-        {
-            var provinces = await GetProvincesAsync();
-            foreach (var province in provinces)
-            {
-                foreach (var district in province.Districts)
-                {
-                    var ward = district.Wards.FirstOrDefault(w => w.Id == wardId);
-                    if (ward != null)
-                    {
-                        return ward.Name;
-                    }
-                }
-            }
-            return "";
-        }
         private Task<AppUser> GetCurrentUserAsync()
         {
             return _userManager.GetUserAsync(HttpContext.User);
         }
-
     }
 }

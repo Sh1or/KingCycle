@@ -1,6 +1,9 @@
+using System.Security.Policy;
 using App.Models;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.EntityFrameworkCore;
 using XEDAPVIP.Models;
+using XEDAPVIP.Services;
 
 public class OrderService
 {
@@ -8,13 +11,17 @@ public class OrderService
     private readonly IHttpContextAccessor _contextAccessor;
     private readonly HttpContext _httpContext;
     private readonly CartService _cartService;
+    private readonly IEmailSender _emailSender;
+    private readonly IVnPayService _vnPayService;
 
-    public OrderService(AppDbContext context, IHttpContextAccessor contextAccessor, CartService cartService)
+    public OrderService(AppDbContext context, IHttpContextAccessor contextAccessor, CartService cartService, IEmailSender emailSender, IVnPayService vnPayService)
     {
         _context = context;
         _contextAccessor = contextAccessor;
         _httpContext = contextAccessor.HttpContext;
         _cartService = cartService;
+        _emailSender = emailSender;
+        _vnPayService = vnPayService;
     }
 
     // Create a new order
@@ -84,6 +91,7 @@ public class OrderService
         await SaveOrderImage(order.OrderDetails);
         await UpdateProductQuantities(cartItems);
 
+        await _emailSender.SendOrderConfirmationEmailAsync(order);
         // Remove Cart Items and Update Product Quantities
         if (string.IsNullOrEmpty(userId))
         {
@@ -95,10 +103,10 @@ public class OrderService
             // Clear database cart items for logged-in user
             await RemoveCartItems(cartItems.Select(ci => ci.Id).ToList());
         }
-
-
         return order;
     }
+
+
     private async Task SaveOrderImage(List<OrderDetail> orderDetails)
     {
         foreach (var orderDetail in orderDetails)
@@ -139,7 +147,7 @@ public class OrderService
                 }
 
                 // Update the path in the database or in-memory object if necessary
-                orderDetail.ProductImage = $"/images/order/{productSlug}order/{mainImageFileName}";
+                orderDetail.ProductImage = $"/images/order/{productSlug}-{orderDetail.Variant.Id}-{orderDetail.OrderId}/{mainImageFileName}";
             }
             catch (UnauthorizedAccessException ex)
             {

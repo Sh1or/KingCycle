@@ -5,6 +5,8 @@ using App.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using XEDAPVIP.Areas.Home.Models.CheckOut;
+using XEDAPVIP.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -134,9 +136,17 @@ builder.Services.AddAuthorization(option =>
     });
 });
 
-// Register CartService
+// var mailsetting = appConfiguration.GetSection("MailSettings");
+// builder.Services.Configure<MailSettings>(mailsetting);
+// builder.Services.AddSingleton<IEmailSender, SendMailService>();
+builder.Services.AddOptions();
+var vnPaySettings = appConfiguration.GetSection("VnPaySettings");
+builder.Services.Configure<VnPaySettings>(vnPaySettings);
+builder.Services.AddSingleton<IVnPayService, VnPayService>();
 builder.Services.AddTransient<CartService>();
 builder.Services.AddTransient<OrderService>();
+
+
 
 var app = builder.Build();
 
@@ -177,7 +187,6 @@ using (var scope = app.Services.CreateScope())
     // Seed data if necessary
     await SeedDataAsync(dbContext, userManager, roleManager);
 }
-
 app.Run();
 
 static async Task SeedDataAsync(AppDbContext dbContext, UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager)

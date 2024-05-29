@@ -25,15 +25,54 @@
     var cartItemIdsJson = Newtonsoft.Json.JsonConvert.SerializeObject(cartItemIds);
 }
 
+<style>
+    .error-messages {
+        width: 400px;
+        color: #ffffff;
+        position: absolute;
+        right: 1%;
+        top: 0;
+        list-style-type: none;
+    }
+
+    .error-messages ul {
+        margin: 0;
+        padding: 0;
+        list-style-type: none;
+    }
+
+    .error-messages li {
+        margin: 5px 0;
+        background-image: linear-gradient(to right, #bfbf0ac2, #22242f 30%);
+        border-radius: 10px;
+        border: 2px solid #000000c2;
+        padding: 5px;
+
+    }
+
+    .kc-01 {
+        width: 20%;
+    }
+
+    .kc-02 {
+        width: 70%;
+    }
+
+    .kc-03 {
+        width: 10%;
+    }
+</style>
+
 <body>
+    <div id="errorMessages" class="error-messages"></div>
+
     <input type="hidden" id="antiForgeryToken" value="@antiForgeryToken" />
 
     <div style="padding-bottom: 200px;" class="cart_shop">
         <div class="grid">
             <div class="is-large">
                 <nav style="text-align: center; width: 100%;" class="woocommerce-breadcrumb breadcrumbs">
-                    <a asp-area="Home" asp-controller="ProductView"
-                                        asp-action="Cart">SHOPPING CART</a>
+                    <a asp-area="Home" asp-controller="ProductView" asp-action="Cart">SHOPPING CART</a>
                     <span style="font-weight: 100;" class="divider">></span>
                     <a style="color: black;" href="#">CHECKOUT DETAILS</a>
                     <span style="font-weight: 100;" class="divider">></span>
@@ -44,6 +83,7 @@
 
             <div class="product_cart_shops">
                 <div class="cart_products_address">
+
                     <div class="orn"></div>
 
                     <div class="text text-information">
@@ -64,12 +104,12 @@
                             </div>
                             <div style="text-align: right;">
                                 <label style="width: 30%; padding-top: 20px;">
-                                    <input type="checkbox" id="toggle-address"> Dùng Địa Chỉ Khác
+                                    <input type="checkbox" id="toggle-address"> Dùng Địa Chỉ Mặc Định
                                 </label>
                             </div>
                         }
                         <div class="text_box" id="add-address-form"
-                            style="@(Model.HomeAddress != null ? "display: none;" : "")">
+                            style="@(Model.HomeAddress != null ? "display: show;" : "")">
                             <div>
                                 <label style="padding: 2px;"></label>
                                 <input type="text" id="streetNumber" class="form-control mb-2"
@@ -197,7 +237,7 @@
                                 <tr class="product_cart_buys check" colspan="2">
                                     <div class="radio-buttons">
                                         <label class="radio-container">Thanh Toán Qua Ngân Hàng/VNPay
-                                            <input type="radio" name="checkTT" value="Bank/VNPay" checked>
+                                            <input type="radio" name="checkTT" value="VNPAY" checked>
                                             <span class="radio-checkmark"></span>
                                         </label>
                                         <label class="radio-container">Thanh Toán Trực Tiếp(COD)
@@ -224,6 +264,7 @@
             </div>
         </div>
     </div>
+
 </body>
 <partial name="_StatusMessage" />
 
@@ -275,22 +316,27 @@
 
             $('#toggle-address').change(function () {
                 if (this.checked) {
-                    $('#add-address-form').show();
-                } else {
                     $('#add-address-form').hide();
+                } else {
+                    $('#add-address-form').show();
                 }
             });
 
             $('input[name="check_GH"]').change(function () {
                 if ($('#pickupInStore').is(':checked')) {
                     $('#addressSelection').hide();
+                    setStoreAddress();
                 } else {
                     $('#addressSelection').show();
+                    resetAddress();
                 }
             });
 
             if ($('#pickupInStore').is(':checked')) {
                 $('#addressSelection').hide();
+                setStoreAddress();
+            } else {
+                resetAddress();
             }
 
             function getSelectedText(elementId) {
@@ -298,8 +344,27 @@
                 return element.options[element.selectedIndex].text;
             }
 
-            var isLoggedIn = '@User.Identity.IsAuthenticated'.toLowerCase();
+            function setStoreAddress() {
+                // Set these values according to your store's address
+                const storeAddress = '123 Store St, Store City, Store Province';
+                $('#defaultAddress').val(storeAddress);
+                $('#defaultAddress').show();
+            }
+
+            function resetAddress() {
+                var address = '@Html.Raw(Model.HomeAddress)'
+                $('#defaultAddress').val(address);
+                $('#defaultAddress').show();
+            }
+
+
+
+
             $('#placeOrderBtn').click(function () {
+                if (!isvalidateForm()) {
+                    return;
+                }
+
                 var selectedProvinceText = getSelectedText('SelectedProvince');
                 var selectedDistrictText = getSelectedText('SelectedDistrict');
                 var selectedWardText = getSelectedText('SelectedWard');
@@ -313,12 +378,12 @@
                 var orderNote = $('#orderNote').val();
                 var shippingMethod = $('input[name="check_GH"]:checked').val();
                 var paymentMethod = $('input[name="checkTT"]:checked').val();
-                var cartItemIdsJson = '@Html.Raw(cartItemIdsJson)';
+                var cartItemIdsJson = "@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.cartItems.Select(item => item.Id).ToList()))";
                 var antiForgeryToken = $('#antiForgeryToken').val();
 
-                var shippingAddress = isOtherAddressChecked ?
+                var shippingAddress = !isOtherAddressChecked ?
                     `${streetNumber}, ${selectedWardText}, ${selectedDistrictText}, ${selectedProvinceText}` :
-                    homeAddress || `${streetNumber}, ${selectedWardText}, ${selectedDistrictText}, ${selectedProvinceText}`;
+                    homeAddress;
 
                 var data = {
                     FullName: fullName,
@@ -334,10 +399,10 @@
                 };
 
                 // Check if the user is logged in and include UserId if true
+                var isLoggedIn = '@User.Identity.IsAuthenticated'.toLowerCase();
                 if (isLoggedIn === "true") {
                     data.UserId = '@Model.UserId';
                 }
-
                 $.ajax({
                     type: 'POST',
                     url: '/PlaceOrder',
@@ -347,20 +412,103 @@
                     contentType: 'application/json',
                     data: JSON.stringify(data),
                     success: function (response) {
-                        // Handle success, e.g., show a success message or redirect to a thank you page
-                        location.reload();
-                        console.log('Order placed successfully:', response);
-                        // Example redirect:
-                        // window.location.href = '/Order/ThankYou';
+                        if (response && response.url) {
+                            window.location.href = response.url; // Đây là dòng quan trọng
+                        } else {
+                            // Nếu không có URL, có thể tải lại trang hoặc hiển thị thông báo
+                            location.reload();
+                        }
                     },
                     error: function (error) {
                         // Handle error, e.g., show an error message
                         console.error('Error placing order:', error);
-                        // Example error message display:
-                        // $('#errorMessage').text('Error placing order. Please try again later.');
                     }
                 });
             });
+
+            function validateEmail(emailAddress) {
+                var regex = /^[a-zA-Z0-9._%+-]+@@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                return regex.test(emailAddress);
+            }
+
+            function checkErrors(fullName, phoneNumber, emailAddress, streetNumber, selectedProvince, selectedDistrict, selectedWard, isOtherAddressChecked, isPickUpInStoreChecked) {
+                var errors = [];
+
+                if (!fullName) {
+                    errors.push("Họ Và Tên Đang Trống !!!");
+                }
+                if (!phoneNumber) {
+                    errors.push("Số Điện Thoại Đang Trống !!!");
+                } else if (!/^\d{10}$/.test(phoneNumber)) {
+                    errors.push("Số Điện Thoại phải gồm 10 chữ số.");
+                }
+                if (!emailAddress) {
+                    errors.push("Địa Chỉ Email Đang Trống !!!");
+                } else if (!validateEmail(emailAddress)) {
+                    errors.push("Vui lòng nhập địa chỉ email hợp lê.");
+                }
+                if (!isPickUpInStoreChecked) {
+                    if (!isOtherAddressChecked) {
+                        if (!streetNumber || streetNumber === "") {
+                            errors.push("Số nhà Đang Trống !!!");
+                        }
+                        if (!selectedProvince || selectedProvince === "Chọn Tỉnh/Thành phố") {
+                            errors.push("Tỉnh/Thành phố Đang Trống !!!");
+                        }
+                        if (!selectedDistrict || selectedDistrict === "Chọn Quận/Huyện") {
+                            errors.push("Quận/Huyện Đang Trống !!!");
+                        }
+                        if (!selectedWard || selectedWard === "Chọn Phường/Xã") {
+                            errors.push("Phường/Xã Đang Trống !!!");
+                        }
+                    }
+                }
+                return errors;
+            }
+
+            function isvalidateForm() {
+                var fullName = $('#fullName').val().trim();
+                var phoneNumber = $('#phoneNumber').val().trim();
+                var emailAddress = $('#emailAddress').val().trim();
+                var streetNumber = $('#streetNumber').val().trim();
+                var selectedProvince = $('#SelectedProvince').val();
+                var selectedDistrict = $('#SelectedDistrict').val();
+                var selectedWard = $('#SelectedWard').val();
+                var isOtherAddressChecked = $('#toggle-address').is(':checked');
+                var isPickUpInStoreChecked = $('#pickupInStore').is(':checked');
+
+                var errors = checkErrors(fullName, phoneNumber, emailAddress, streetNumber, selectedProvince, selectedDistrict, selectedWard, isOtherAddressChecked, isPickUpInStoreChecked, true);
+
+                if (errors.length > 0) {
+                    var errorMessagesElement = $('#errorMessages');
+                    errorMessagesElement.empty();
+
+                    var errorList = $('<ul></ul>');
+                    errors.forEach(function (error) {
+                        errorList.append('<li>' + '<div style ="display:flex;">' + '<div class="kc-01" style ="text-align:center">' + '<i style="padding:5px; font-size:2.5rem; color: #fff500;" class="start-icon fa fa-exclamation-triangle faa-flash animated"></i>' +
+                            '</div>' + '<div class="kc-02">' + '<strong style ="display:block;"  class="font__weight-semibold">Warning!!!</strong>' + error + '</div>' +
+                            '<button style ="width:10%; color:#fff"   type="button" class="close kc-03" data-dismiss="alert" aria-label="Close">' + '<span aria-hidden="true">&times;</span>' + '</button>' + '</div>'
+                            + '</li>'
+                        );
+                    });
+                    errorMessagesElement.append(errorList);
+
+                    $('.close').click(function () {
+                        $(this).closest('li').hide();
+                    });
+
+                    return false;
+                }
+
+                return true;
+            }
+
+
         });
     </script>
 }
+<script>
+
+
+
+</script>
