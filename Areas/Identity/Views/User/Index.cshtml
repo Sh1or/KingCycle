@@ -29,23 +29,26 @@
             <td style="width: 30$;">
                 <div>
                     <div style="display: flex;">
-                        <div style="padding-right: 1%;" >
-                            <a style="padding: 10px 20px;" class="btn btn-success btn-sm btn-warning" asp-action="SetPassword" asp-route-id="@user.Id">Đặt mật
+                        <div style="padding-right: 1%;">
+                            <a style="padding: 10px 20px;" class="btn btn-success btn-sm btn-warning"
+                                asp-action="SetPassword" asp-route-id="@user.Id">Đặt mật
                                 khẩu</a>
                         </div>
-                        <div style="padding-right: 1%;" >
-                            <a style="padding: 10px 20px;"   class="btn btn-info btn-sm btn-warning" asp-action="UserDetail" asp-route-id="@user.Id">Xem chi tiết</a>
+                        <div style="padding-right: 1%;">
+                            <a style="padding: 10px 20px;" class="btn btn-info btn-sm btn-warning" asp-action="UserDetail"
+                                asp-route-id="@user.Id">Xem chi tiết</a>
                         </div>
                         <div style="padding-right: 1%;">
-                            <form   asp-action="LockUser" asp-route-id="@user.Id" method="post">
+                            <form asp-action="LockUser" asp-route-id="@user.Id" method="post">
                                 <button style="padding: 10px 20px;" type="submit" class="btn  btn-sm btn-warning">
                                     Khóa
                                 </button>
                             </form>
                         </div>
-                        <div >
-                            <form  asp-action="UnlockUser" asp-route-id="@user.Id" method="post">
-                                <button style="padding: 10px 20px;" type="submit" class="btn btn-success btn-sm btn-warning">
+                        <div>
+                            <form asp-action="UnlockUser" asp-route-id="@user.Id" method="post">
+                                <button style="padding: 10px 20px;" type="submit"
+                                    class="btn btn-success btn-sm btn-warning">
                                     Mở Khóa
                                 </button>
                             </form>
