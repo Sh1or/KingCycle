@@ -22,9 +22,30 @@
         margin-bottom: 0;
         font-size: 1.15rem;
     }
+
+    .custom-alert {
+        position: sticky;
+        top: 0;
+        right: 0;
+        display: none;
+        width: 300px;
+        height: auto;
+        border: 3px solid;
+        border-radius: 50px;
+        background-color: yellow;
+        z-index: 10000;
+    }
 </style>
+<div id="customAlert" class="custom-alert">
+    <div style="display: block;box-shadow: none;" class="popup-content">
+        <i style="font-size: 1rem;" class="fa-regular fa-bell"></i>
+        <span style="padding-left: 2%;" id="alertMessage"></span>
+    </div>
+</div>
 
 <body>
+
+
     <div class="container mt-3">
         <!-- Row for the summary cards -->
         <div style="padding-bottom: 50px;" class="row">
@@ -260,7 +281,7 @@
                 var endDate = document.getElementById('endDate').value;
 
                 if (!startDate || !endDate) {
-                    alert("Vui lòng chọn cả hai ngày!");
+                    showCustomAlert("Vui lòng chọn cả hai ngày !!!");
                     return;
                 }
 
@@ -277,10 +298,22 @@
                         revenueChart.update();
                     },
                     error: function () {
-                        alert("Đã xảy ra lỗi khi tải dữ liệu.");
+                        showCustomAlert("Đã xảy ra lỗi khi tải dữ liệu.");
                     }
                 });
             });
+
+            function showCustomAlert(message) {
+                var alertBox = document.getElementById('customAlert');
+                var alertMessage = document.getElementById('alertMessage');
+                alertMessage.textContent = message;
+                alertBox.style.display = 'block';
+
+                setTimeout(function () {
+                    alertBox.style.display = 'none';
+                }, 3000); // Thời gian hiển thị là 3000ms tương đương 3 giây
+            }
+
 
             var topSellingProductsCtx = document.getElementById('topSellingProductsChart').getContext('2d');
             var topSellingProductsChart = new Chart(topSellingProductsCtx, {
