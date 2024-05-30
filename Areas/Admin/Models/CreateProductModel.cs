@@ -23,3 +23,5 @@ namespace XEDAPVIP.Areas.Admin.ModelsProduct
         public string DetailsValue { get; set; }
     }
 }
+
+
