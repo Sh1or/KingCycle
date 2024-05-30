@@ -89,8 +89,9 @@ namespace App.Areas.Home.Controllers
                 }
                 if (promotionFilters.Contains("highest-discount"))
                 {
-                    products = products.Where(p => p.DiscountPrice < 10000000);
+                    products = products.Where(p => p.DiscountPrice.HasValue && (p.Price - p.DiscountPrice.Value) < 50000000);
                 }
+
             }
 
             if (!string.IsNullOrEmpty(brandslug))

@@ -77,6 +77,12 @@ namespace App.Areas.Identity.Controllers
                 if (result.Succeeded)
                 {
                     _logger.LogInformation(1, "User logged in.");
+                    var user = await _userManager.FindByNameAsync(model.UserNameOrEmail);
+                    if (user != null && await _userManager.IsInRoleAsync(user, "Administrator"))
+                    {
+                        returnUrl = Url.Content("~/Admin/Index");
+                    }
+
                     return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)

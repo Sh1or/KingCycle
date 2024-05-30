@@ -80,16 +80,16 @@
         <div class="grid">
             <div class="product_main">
                 <!--bo suu tap xe dap-->
-                <div class="collect">
+                <div style="margin: 50px 0;" class="collect">
                     <h1 class="bosuutap">
                         <span>
                             BỘ SƯU TẬP XE ĐẠP 2025
                         </span>
                     </h1>
-                    <div class="pox-1">
+                    <div  style="padding: 10px; height: 450px;" class="pox-1">
                         @foreach( var product in productsNew){
                             <div class="tst-sale">
-                            <div class="fom">
+                            <div style="height: 400px;" class="fom">
                                 <a style="text-decoration: none;" href="" class="text-center">
                                     <div class="product-top">
                                         <img class="card-img-top" src="@Url.Content("~/images/products/" + product.Slug + "/" + product.MainImage)" alt="@product.Name">
@@ -132,14 +132,7 @@
                     </div>
 
                 </div>
-                <div class="collect-more_product">
-                    <a href="" class="button-more_product">
-                        <span>Xem Thêm</span>
-                        <i class="fa-solid fa-caret-down"></i>
-                    </a>
-                </div>
                 <!-- xe dap tre em -->
-                <div class="onr"></div>
                 <div class="xedaptreem">
                     <div class="headline">
                         <a href="">XE ĐẠP TRẺ EM</a>

@@ -32,27 +32,46 @@ namespace XEDAPVIP.Controllers
                 .ThenInclude(od => od.Variant)
                 .ToListAsync();
 
+            // Các trạng thái không hợp lệ
+            var invalidStatuses = new[] { "Pending", "Canceled", "Failed" };
+
             // Tính toán doanh thu
+            var today = DateTime.Today;
+            var yesterday = today.AddDays(-1);
+            var weekStart = today.AddDays(-7);
+            var monthStart = today.AddMonths(-1);
+
+            // Doanh thu hôm nay
             var todayRevenue = await _context.Orders
-                .Where(o => o.OrderDate.Date == DateTime.Today)
+                .Where(o => o.OrderDate.Date == today && !invalidStatuses.Contains(o.Status))
                 .SumAsync(o => o.TotalAmount);
 
+            // Doanh thu ngày hôm trước
             var previousDayRevenue = await _context.Orders
-                .Where(o => o.OrderDate.Date == DateTime.Today.AddDays(-1))
+                .Where(o => o.OrderDate.Date == yesterday && !invalidStatuses.Contains(o.Status))
                 .SumAsync(o => o.TotalAmount);
 
+            // Doanh thu tuần trước (trong 7 ngày qua không bao gồm hôm nay)
             var previousWeekRevenue = await _context.Orders
-                .Where(o => o.OrderDate >= DateTime.Today.AddDays(-7) && o.OrderDate < DateTime.Today)
+                .Where(o => o.OrderDate >= weekStart && o.OrderDate < today && !invalidStatuses.Contains(o.Status))
                 .SumAsync(o => o.TotalAmount);
 
+            // Doanh thu tháng trước (trong 30 ngày qua không bao gồm hôm nay)
             var previousMonthRevenue = await _context.Orders
-                .Where(o => o.OrderDate >= DateTime.Today.AddMonths(-1) && o.OrderDate < DateTime.Today)
+                .Where(o => o.OrderDate >= monthStart && o.OrderDate < today && !invalidStatuses.Contains(o.Status))
                 .SumAsync(o => o.TotalAmount);
 
             dashboardData.TotalRevenue = todayRevenue;
-            dashboardData.PercentageChangePreviousDay = previousDayRevenue != 0 ? (todayRevenue - previousDayRevenue) * 100 / previousDayRevenue : 0;
-            dashboardData.PercentageChangePreviousWeek = previousWeekRevenue != 0 ? (todayRevenue - previousWeekRevenue) * 100 / previousWeekRevenue : 0;
-            dashboardData.PercentageChangePreviousMonth = previousMonthRevenue != 0 ? (todayRevenue - previousMonthRevenue) * 100 / previousMonthRevenue : 0;
+            dashboardData.PercentageChangePreviousDay = previousDayRevenue != 0
+                ? (todayRevenue - previousDayRevenue) * 100 / previousDayRevenue
+                : 0;
+            dashboardData.PercentageChangePreviousWeek = previousWeekRevenue != 0
+                ? (todayRevenue - previousWeekRevenue) * 100 / previousWeekRevenue
+                : 0;
+            dashboardData.PercentageChangePreviousMonth = previousMonthRevenue != 0
+                ? (todayRevenue - previousMonthRevenue) * 100 / previousMonthRevenue
+                : 0;
+
 
             // Tính toán số lượng sản phẩm bán chạy
             var productSalesQuery = _context.OrderDetails
@@ -104,6 +123,7 @@ namespace XEDAPVIP.Controllers
             dashboardData.PaidOrders = orders.Count(o => o.Status == "Paid");
             dashboardData.CompletedOrders = orders.Count(o => o.Status == "Completed");
             dashboardData.CanceledOrders = orders.Count(o => o.Status == "Canceled");
+            dashboardData.FailedOrders = orders.Count(o => o.Status == "Failed");
 
             return View(dashboardData);
         }
@@ -137,6 +157,7 @@ namespace XEDAPVIP.Controllers
             public int PaidOrders { get; set; }
             public int CompletedOrders { get; set; }
             public int CanceledOrders { get; set; }
+            public int FailedOrders { get; set; }
             public int TotalUsers { get; set; }
             public int TotalRevenue { get; set; }
             public int TotalOrders { get; set; }

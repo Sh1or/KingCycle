@@ -84,7 +84,10 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LoginPath = "/login/";
     options.LogoutPath = "/logout/";
     options.AccessDeniedPath = "/khongduoctruycap.html";
+    options.ExpireTimeSpan = TimeSpan.FromDays(14); // Cookie sẽ hết hạn sau 14 ngày
+    options.SlidingExpiration = true; // Tự động làm mới thời gian sống của cookie
 });
+
 
 builder.Services.AddSession(options =>
 {
@@ -162,7 +165,18 @@ app.UseRouting();
 app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.Use(async (context, next) =>
+{
+    if (context.User.Identity.IsAuthenticated && context.User.IsInRole("Administrator"))
+    {
+        if (context.Request.Path == "/")
+        {
+            context.Response.Redirect("/Admin/Index");
+            return;
+        }
+    }
+    await next();
+});
 app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");

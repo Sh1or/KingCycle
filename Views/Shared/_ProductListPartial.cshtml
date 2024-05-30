@@ -25,6 +25,8 @@
                 <div class="product-price">
                     @if (product.DiscountPrice.HasValue)
                     {
+                        <span style="text-decoration: line-through;">@product.Price.ToString("N0")VND</span>
+                        <br />
                         <span>@product.DiscountPrice.Value.ToString("N0") VND</span>
                     }
                     else

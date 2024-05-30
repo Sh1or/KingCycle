@@ -100,14 +100,14 @@
     <div class="container">
         @if (Model.Status != "Completed" && Model.Status != "Canceled" && Model.Status != "Failed")
         {
-            <button class="btn btn-primary btn-sm" onclick="openEditModal(@Model.OrderId, '@Model.Status')">Sửa</button>
+            <button style="padding: 10px 15px; width: 100px;" class="btn btn-primary btn-sm" onclick="openEditModal(@Model.OrderId, '@Model.Status')">Sửa</button>
         }
         @if (Model.Status == "Canceled" || Model.Status == "Failed")
         {
-            <button style="width: 100px;  margin-right: 0;" class="btn btn-danger btn-sm"
+            <button style="width: 100px; padding: 10px 15px ;  margin-right: 0;" class="btn btn-danger btn-sm"
                 onclick="confirmDelete(@Model.OrderId)">Xóa</button>
         }
-        <a class="btn btn-secondary" asp-action="Index">Back to List</a>
+        <a style="padding: 10px 15px ;" class="btn btn-secondary" asp-action="Index">Back to List</a>
     </div>
 
     <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel"

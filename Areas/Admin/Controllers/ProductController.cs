@@ -132,22 +132,27 @@ namespace XEDAPVIP.Areas.Admin.Controllers
         {
             if (product.CategoryId == null || product.CategoryId.Length == 0)
             {
-                TempData["StatusMessage"] = "Phải chọn ít nhất một danh mục";
+                TempData["ErrorMessage"] = "Phải chọn ít nhất một danh mục";
                 return await ReinitializeCreateView(product);
             }
 
             if (product.Variants == null || !product.Variants.Any())
             {
-                TempData["StatusMessage"] = "Phải nhập ít nhất một biến thể";
+                TempData["ErrorMessage"] = "Phải nhập ít nhất một biến thể";
                 return await ReinitializeCreateView(product);
             }
 
             if (mainImage == null || mainImage.Length == 0)
             {
-                TempData["StatusMessage"] = "Phải tải lên ảnh chính cho sản phẩm";
+                TempData["ErrorMessage"] = "Phải tải lên ảnh chính cho sản phẩm";
                 return await ReinitializeCreateView(product);
             }
+            if (product.Price < product.DiscountPrice)
+            {
+                TempData["ErrorMessage"] = "Không được nhập giá giảm cao hơn giá gốc";
+                return await ReinitializeCreateView(product);
 
+            }
             product.Slug = Utils.GenerateSlug(product.Name);
             ModelState.SetModelValue("Slug", new ValueProviderResult(product.Slug));
 
@@ -162,7 +167,7 @@ namespace XEDAPVIP.Areas.Admin.Controllers
             bool SlugExisted = await _context.Products.AnyAsync(p => p.Slug == product.Slug);
             if (SlugExisted)
             {
-                TempData["StatusMessage"] = "Slug đã tồn tại trong cơ sở dữ liệu";
+                TempData["ErrorMessage"] = "Sản phẩm đã tồn tại trong cơ sở dữ liệu";
                 return await ReinitializeCreateView(product);
             }
 
@@ -171,7 +176,7 @@ namespace XEDAPVIP.Areas.Admin.Controllers
             {
                 if (string.IsNullOrEmpty(detail.DetailsName) || string.IsNullOrEmpty(detail.DetailsValue))
                 {
-                    TempData["StatusMessage"] = "Chi tiết sản phẩm không được để trống.";
+                    TempData["ErrorMessage"] = "Chi tiết sản phẩm không được để trống.";
                     return await ReinitializeCreateView(product);
                 }
                 productDetails.Add(detail.DetailsName, detail.DetailsValue);
@@ -301,6 +306,12 @@ namespace XEDAPVIP.Areas.Admin.Controllers
             if (id != product.Id)
             {
                 return NotFound();
+            }
+            if (product.Price < product.DiscountPrice)
+            {
+                TempData["ErrorMessage"] = "Không được nhập giá giảm cao hơn giá gốc";
+                return await ReinitializeCreateView(product);
+
             }
             product.Slug = Utils.GenerateSlug(product.Name);
             ModelState.SetModelValue("Slug", new ValueProviderResult(product.Slug));
