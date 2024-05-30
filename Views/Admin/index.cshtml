@@ -229,22 +229,30 @@
             var orderStatusChart = new Chart(orderStatusCtx, {
                 type: 'pie',
                 data: {
-                    labels: ['Pending', 'Paid', 'Completed', 'Canceled'],
+                    labels: ['Pending', 'Paid', 'Completed', 'Canceled', 'Failed'],
                     datasets: [{
                         label: 'Order Status',
                         data: [
         @Model.PendingOrders,
         @Model.PaidOrders,
         @Model.CompletedOrders,
-        @Model.CanceledOrders
+        @Model.CanceledOrders,
+        @Model.FailedOrders
                         ],
-                        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#FF4500']
+                        backgroundColor: [
+                            '#FF6384', // Pending - Red
+                            '#36A2EB', // Paid - Blue
+                            '#FFCE56', // Completed - Yellow
+                            '#FF4500', // Canceled - OrangeRed
+                            '#A9A9A9'  // Failed - DarkGray
+                        ]
                     }]
                 },
                 options: {
                     responsive: true
                 }
             });
+
 
             var revenueCtx = document.getElementById('revenueChart').getContext('2d');
             var revenueChart = new Chart(revenueCtx, {
