@@ -38,3 +38,7 @@ dotnet add package Microsoft.Extensions.Caching.Memory
 # Generate Database
 
 dotnet ef database update
+
+
+Demo
+![image](https://github.com/user-attachments/assets/c7e45e22-7733-46c9-b507-d1d3a9dd85fc)
