@@ -55,7 +55,7 @@ dotnet ef database update
 ```
 
 
-Demo 
+# Demo 
 Homepage:
 ![image](https://github.com/user-attachments/assets/c7e45e22-7733-46c9-b507-d1d3a9dd85fc)
 ![image](https://github.com/user-attachments/assets/4d291574-08ce-4e4b-9fc6-e5689c3e1ad3)
@@ -67,6 +67,7 @@ Homepage:
 ![image](https://github.com/user-attachments/assets/0d043f62-618d-45d3-8275-ef7ba7745689)
 ![image](https://github.com/user-attachments/assets/1adea82c-9f56-41d0-ac1a-4497399ab1b4)
 ![image](https://github.com/user-attachments/assets/cdccdfa3-0f39-44a3-808a-c545ff52fe3e)
+
 Adminpage:
 ![image](https://github.com/user-attachments/assets/b077b67c-6b50-4b56-a49f-22d99dfea79e)
 ![image](https://github.com/user-attachments/assets/75764106-fa63-4198-ab04-0237077f97ea)
@@ -77,5 +78,9 @@ Adminpage:
 ![image](https://github.com/user-attachments/assets/60971ede-4f5c-4508-8823-efa899e00e45)
 ![image](https://github.com/user-attachments/assets/3d209e00-2405-4e40-8e13-360f4725b6c2)
 ![Untitled](https://github.com/user-attachments/assets/7e08fb80-0c8a-4ba8-8920-2cb3a0a7085e)
+
+Database:
+![image](https://github.com/user-attachments/assets/760f65fe-750b-4e36-a3f2-d40831a8988d)
+
 
 
