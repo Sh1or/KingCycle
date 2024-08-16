@@ -75,5 +75,6 @@ Adminpage:
 ![image](https://github.com/user-attachments/assets/1d556513-8c99-4366-8338-0d932cad8c75)
 ![image](https://github.com/user-attachments/assets/60971ede-4f5c-4508-8823-efa899e00e45)
 ![image](https://github.com/user-attachments/assets/3d209e00-2405-4e40-8e13-360f4725b6c2)
-![image](https://github.com/user-attachments/assets/287ef9c2-ff15-4022-96fb-cb874d6cd330)
+![Untitled](https://github.com/user-attachments/assets/7e08fb80-0c8a-4ba8-8920-2cb3a0a7085e)
+
 
